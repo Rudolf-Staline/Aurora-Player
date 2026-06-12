@@ -2,10 +2,24 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+interface ViteServer {
+  middlewares: { use: (path: string, handler: (req: IncomingMessage, res: ServerResponse) => void) => void };
+}
+
+interface IncomingMessage {
+  url?: string;
+}
+
+interface ServerResponse {
+  statusCode: number;
+  setHeader: (header: string, value: string) => void;
+  end: (data?: string) => void;
+}
+
 const rawProxyPlugin = () => ({
   name: 'raw-proxy',
-  configureServer(server: any) {
-    server.middlewares.use('/raw-proxy', async (req: any, res: any) => {
+  configureServer(server: ViteServer) {
+    server.middlewares.use('/raw-proxy', async (req: IncomingMessage, res: ServerResponse) => {
       const urlStr = new URL(req.url || '', 'http://localhost').searchParams.get('url');
       if (!urlStr) {
          res.statusCode = 400;
@@ -20,9 +34,9 @@ const rawProxyPlugin = () => ({
         res.setHeader('Content-Type', fetchRes.headers.get('content-type') || 'application/xml');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.end(body);
-      } catch (e: any) {
+      } catch (err: unknown) {
          res.statusCode = 500;
-         res.end(e.toString());
+         res.end(err instanceof Error ? err.toString() : 'Unknown error');
       }
     });
   }

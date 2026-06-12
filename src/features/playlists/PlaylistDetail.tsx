@@ -7,9 +7,10 @@ import { Play, ArrowLeft, GripVertical, Trash2, Clock, Music } from 'lucide-reac
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import type { Track } from '../../store/usePlayerStore';
 
 interface SortableTrackProps {
-  track: any;
+  track: Track;
   index: number;
   onRemove: (id: string) => void;
   onPlay: () => void;

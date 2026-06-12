@@ -140,7 +140,7 @@ class AudioEngine {
                 break;
             }
           });
-        } catch (e) {
+        } catch {
           console.warn(`Action ${action} not supported.`);
         }
       });
@@ -198,14 +198,16 @@ class AudioEngine {
           usePlayerStore.getState().setProgress(currentTime / duration);
         }
         
-        if ('mediaSession' in navigator && (navigator.mediaSession as any).setPositionState) {
+        if ('mediaSession' in navigator && (navigator.mediaSession as unknown as { setPositionState?: (state: { duration: number; playbackRate: number; position: number }) => void }).setPositionState) {
           try {
-            (navigator.mediaSession as any).setPositionState({
+            (navigator.mediaSession as unknown as { setPositionState: (state: { duration: number; playbackRate: number; position: number }) => void }).setPositionState({
               duration: duration,
               playbackRate: 1,
               position: currentTime
             });
-          } catch (e) {}
+          } catch {
+            // Ignore position state errors
+          }
         }
       }
     }, 1000);

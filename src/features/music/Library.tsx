@@ -6,7 +6,15 @@ import { scanDirectory, getFileMetadata } from '../../utils/fileScanner';
 import { TrackList } from './TrackList';
 import { audioEngine } from '../../core/audio_engine';
 
-const mockAlbums = [
+interface AlbumData {
+  id: string;
+  title: string;
+  artist: string;
+  year: number;
+  coverUrl: string;
+}
+
+const mockAlbums: AlbumData[] = [
   { id: '1', title: 'Neon Nights', artist: 'Synthwave Dreamer', year: 2024, coverUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop' },
   { id: '2', title: 'Midnight City', artist: 'The Midnight', year: 2022, coverUrl: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?q=80&w=300&auto=format&fit=crop' },
   { id: '3', title: 'Cyberpunk Drive', artist: 'LazerHawk', year: 2023, coverUrl: 'https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=300&auto=format&fit=crop' },
@@ -26,7 +34,7 @@ export const Library: React.FC = () => {
         return;
       }
       
-      const dirHandle = await (window as any).showDirectoryPicker();
+      const dirHandle = await (window as unknown as { showDirectoryPicker: () => Promise<FileSystemDirectoryHandle> }).showDirectoryPicker();
       setIsScanning(true);
       setError('');
       
@@ -62,8 +70,8 @@ export const Library: React.FC = () => {
       if (newTracks.length > 0) {
         toast.success(`${newTracks.length} tracks processed.`);
       }
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name !== 'AbortError') {
          setError(err.message || "Failed to scan folder.");
       }
     } finally {
@@ -71,7 +79,7 @@ export const Library: React.FC = () => {
     }
   };
 
-  const handlePlayDemo = (album: typeof mockAlbums[0]) => {
+  const handlePlayDemo = (album: AlbumData) => {
     const mockTrack: Track = {
       id: `demo-${album.id}`,
       title: `${album.title} - Intro`,

@@ -136,7 +136,7 @@ export const usePlaylistStore = create<PlaylistState>()(
 );
 
 // Auto-save to cloud on changes
-let saveTimeout: any;
+let saveTimeout: ReturnType<typeof setTimeout>;
 usePlaylistStore.subscribe((state, prevState) => {
    if (state.playlists !== prevState.playlists && state.playlists.length > 0) {
        clearTimeout(saveTimeout);

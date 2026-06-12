@@ -1,6 +1,14 @@
 import { parseBlob } from 'music-metadata';
 
-export const getFileMetadata = async (file: File): Promise<{ title: string; artist: string; album: string; artworkUrl?: string; duration?: number }> => {
+interface FileMetadata {
+  title: string;
+  artist: string;
+  album: string;
+  artworkUrl?: string;
+  duration?: number;
+}
+
+export const getFileMetadata = async (file: File): Promise<FileMetadata> => {
   let title = file.name.replace(/\.[^/.]+$/, ""); // Remove extension fallback
   let artist = 'Unknown Artist';
   let album = 'Local Files';
@@ -35,7 +43,7 @@ export const getFileMetadata = async (file: File): Promise<{ title: string; arti
   return { title, artist, album, artworkUrl, duration };
 };
 
-export const scanDirectory = async (dirHandle: any): Promise<File[]> => {
+export const scanDirectory = async (dirHandle: FileSystemDirectoryHandle): Promise<File[]> => {
   const files: File[] = [];
   const supportedExtensions = ['.mp3', '.flac', '.wav', '.m4a', '.ogg'];
 

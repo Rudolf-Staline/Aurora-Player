@@ -43,8 +43,8 @@ export const PodcastSearch: React.FC = () => {
       setResults(fetchedResults.slice(0, PAGE_SIZE));
       setHasMore(fetchedResults.length > PAGE_SIZE);
       
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch podcasts');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch podcasts');
     } finally {
       setLoading(false);
     }

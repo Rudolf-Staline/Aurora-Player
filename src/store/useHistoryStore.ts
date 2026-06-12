@@ -22,7 +22,7 @@ interface HistoryState {
 
 export const useHistoryStore = create<HistoryState>()(
   persist(
-    (set, _get) => ({
+    (set) => ({
       history: [],
       addEntry: (entry) => {
         set((state) => {

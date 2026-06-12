@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 
+interface TokenResponse {
+  access_token: string;
+  [key: string]: unknown;
+}
+
 export interface User {
   name: string;
   email: string;
@@ -11,7 +16,7 @@ interface AuthState {
   accessToken: string | null;
   user: User | null;
 
-  login: (tokenResponse: any) => Promise<void>;
+  login: (tokenResponse: TokenResponse) => Promise<void>;
   logout: () => void;
   restoreSession: () => void;
 }
@@ -21,7 +26,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   accessToken: null,
   user: null,
 
-  login: async (tokenResponse: any) => {
+  login: async (tokenResponse: TokenResponse) => {
     try {
       const { access_token } = tokenResponse;
       
@@ -63,7 +68,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       try {
         const user = JSON.parse(userJson);
         set({ isConnected: true, accessToken: token, user });
-      } catch (e) {
+      } catch {
         console.error('Failed to parse user from local storage');
       }
     }
