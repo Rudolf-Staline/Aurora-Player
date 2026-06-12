@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Play, MoreHorizontal, Heart, Plus, Loader2, ListPlus, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { usePlayerStore, type Track } from '../../store/usePlayerStore';
@@ -15,9 +15,9 @@ interface TrackListProps {
 export const TrackList: React.FC<TrackListProps> = ({ tracks, onPlayContext, loadingTrackId }) => {
   const { trackIds: favorites, toggleTrackFavorite: toggleFavorite } = useFavoritesStore();
   const { playlists, addTrackToPlaylist, createPlaylist } = usePlaylistStore();
-  const [contextMenuId, setContextMenuId] = useState<string | null>(null);
-  const [selectedTracks, setSelectedTracks] = useState<Track[]>([]);
-  const [showPlaylistModal, setShowPlaylistModal] = useState(false);
+  const [contextMenuId, setContextMenuId] = React.useState<string | null>(null);
+  const [selectedTracks, setSelectedTracks] = React.useState<Track[]>([]);
+  const [showPlaylistModal, setShowPlaylistModal] = React.useState(false);
 
   const toggleSelection = (track: Track) => {
     setSelectedTracks(prev => {

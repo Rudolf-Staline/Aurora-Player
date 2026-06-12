@@ -47,8 +47,8 @@ export const PodcastDetail: React.FC = () => {
 
       const data = await parseRSSFeed(feedUrl, podcast.artworkUrl600, podcast.collectionName);
       setEpisodes(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load episodes');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load episodes');
     } finally {
       setLoading(false);
     }

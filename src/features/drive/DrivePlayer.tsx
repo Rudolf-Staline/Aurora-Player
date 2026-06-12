@@ -7,7 +7,16 @@ import { usePlayerStore, type Track } from '../../store/usePlayerStore';
 import { TrackList } from '../music/TrackList';
 import { audioEngine } from '../../core/audio_engine';
 
-function detectChanges(cached: any[], fresh: any[]): boolean {
+interface DriveFile {
+  id: string;
+  name: string;
+  mimeType?: string;
+  size?: string;
+  modifiedTime?: string;
+  streamUrl?: string;
+}
+
+function detectChanges(cached: DriveFile[], fresh: DriveFile[]): boolean {
   if (cached.length !== fresh.length) return true;
   
   const cachedIds = new Set(cached.map(f => f.id));
@@ -31,7 +40,7 @@ function detectChanges(cached: any[], fresh: any[]): boolean {
 
 export const DrivePlayer: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('aurora_auth_token'));
-  const [files, setFiles] = useState<any[]>([]);
+  const [files, setFiles] = useState<DriveFile[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [lastScanned, setLastScanned] = useState<string | null>(null);
@@ -49,8 +58,9 @@ export const DrivePlayer: React.FC = () => {
       } else {
         setError('Failed to authenticate with Google Drive.');
       }
-    } catch (err: any) {
-      setError(err.message || 'Authentication error.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Authentication error.';
+      setError(errorMessage);
     } finally {
       setIsScanning(false);
     }
@@ -70,10 +80,10 @@ export const DrivePlayer: React.FC = () => {
     if (!token) return;
     
     // Step 1: Show cache instantly
-    const cache = await loadFromCloud('aurora_drive_cache.json');
+    const cache = await loadFromCloud<{ files?: DriveFile[]; lastScanned?: string | null }>('aurora_drive_cache.json');
     if (cache?.files?.length) {
       setFiles(cache.files);
-      setLastScanned(cache.lastScanned);
+      setLastScanned(cache.lastScanned ?? null);
       setIsFirstLoad(false);
     } else {
       setIsFirstLoad(true);
@@ -82,10 +92,10 @@ export const DrivePlayer: React.FC = () => {
     // Step 2: Progressive background scan
     setIsScanning(true);
     setError('');
-    const allFresh: any[] = [];
+    const allFresh: DriveFile[] = [];
 
     try {
-      await scanAllAudioFiles(token, (newFiles) => {
+      await scanAllAudioFiles(token, (newFiles: DriveFile[]) => {
         allFresh.push(...newFiles);
         
         setFiles(prev => {
@@ -117,7 +127,7 @@ export const DrivePlayer: React.FC = () => {
         }
       }
 
-      const tracks: Track[] = allFresh.map((file: any) => ({
+      const tracks: Track[] = allFresh.map((file: DriveFile) => ({
           id: file.id,
           title: file.name.replace(/\.[^/.]+$/, ""),
           artist: 'Google Drive',
@@ -127,7 +137,7 @@ export const DrivePlayer: React.FC = () => {
       }));
       setLocalTracks(tracks);
 
-    } catch (err: any) {
+    } catch {
       setError('Failed to fetch files from Google Drive.');
       setToken(null);
       localStorage.removeItem('aurora_auth_token');

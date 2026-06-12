@@ -4,12 +4,13 @@ import { usePlayerStore } from '../store/usePlayerStore';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import type { Track } from '../store/usePlayerStore';
 
 interface QueuePanelProps {
   onClose: () => void;
 }
 
-const SortableTrackItem = ({ track }: { track: any }) => {
+const SortableTrackItem = ({ track }: { track: Track }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: track.id });
   const { currentTrack, playTrack, removeFromQueue } = usePlayerStore();
 
@@ -53,7 +54,7 @@ export const QueuePanel: React.FC<QueuePanelProps> = ({ onClose }) => {
     })
   );
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: { active: { id: string | number }; over: { id: string | number } | null }) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const oldIndex = queue.findIndex((t) => t.id === active.id);

@@ -2,7 +2,6 @@ const SCOPES = 'https://www.googleapis.com/auth/drive.readonly https://www.googl
 
 export const initGoogleDriveAuth = (): Promise<string | null> => {
   return new Promise((resolve) => {
-    // If we already have a token, just return it
     const token = localStorage.getItem('aurora_auth_token');
     if (token) {
         resolve(token);
@@ -14,20 +13,26 @@ export const initGoogleDriveAuth = (): Promise<string | null> => {
     script.async = true;
     script.defer = true;
     script.onload = () => {
-      const client = (window as any).google.accounts.oauth2.initTokenClient({
+      if (!window.google?.accounts?.oauth2) {
+        resolve(null);
+        return;
+      }
+      
+      const client = window.google.accounts.oauth2.initTokenClient({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
         scope: SCOPES,
-        callback: (response: any) => {
+        callback: (response) => {
           if (response.error !== undefined) {
             console.error('Google Auth Error:', response);
             resolve(null);
-          } else {
+          } else if (response.access_token) {
             localStorage.setItem('aurora_auth_token', response.access_token);
             resolve(response.access_token);
+          } else {
+            resolve(null);
           }
         },
       });
-      // Try to auto-authorize without popup if possible
       client.requestAccessToken({ prompt: '' });
     };
     document.head.appendChild(script);
@@ -39,17 +44,19 @@ export const requireDriveAuth = (): Promise<string | null> => {
     const token = localStorage.getItem('aurora_auth_token');
     if (token) return resolve(token);
 
-    if (!(window as any).google) return resolve(null); // Should be loaded by init
+    if (!window.google?.accounts?.oauth2) return resolve(null);
 
-    const client = (window as any).google.accounts.oauth2.initTokenClient({
+    const client = window.google.accounts.oauth2.initTokenClient({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
         scope: SCOPES,
-        callback: (response: any) => {
+        callback: (response) => {
           if (response.error !== undefined) {
             resolve(null);
-          } else {
+          } else if (response.access_token) {
             localStorage.setItem('aurora_auth_token', response.access_token);
             resolve(response.access_token);
+          } else {
+            resolve(null);
           }
         },
     });
@@ -60,6 +67,15 @@ export const requireDriveAuth = (): Promise<string | null> => {
 import { useAuthStore } from '../store/useAuthStore';
 import { toast } from 'react-hot-toast';
 
+interface DriveFile {
+  id: string;
+  name: string;
+  mimeType?: string;
+  size?: string;
+  modifiedTime?: string;
+  parents?: string[];
+}
+
 const handleApiError = (res: Response) => {
     if (res.status === 401) {
         useAuthStore.getState().logout();
@@ -68,14 +84,14 @@ const handleApiError = (res: Response) => {
     }
 };
 
-export const fetchDriveAudioFiles = async (token: string) => {
+export const fetchDriveAudioFiles = async (token: string): Promise<DriveFile[]> => {
     const query = encodeURIComponent("mimeType contains 'audio'");
     const url = `https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name,mimeType,size,thumbnailLink,modifiedTime)&pageSize=200`;
-    
+
     const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` }
     });
-    
+
     handleApiError(res);
     if (!res.ok) throw new Error('Failed to fetch from Drive');
     const data = await res.json();
@@ -84,27 +100,27 @@ export const fetchDriveAudioFiles = async (token: string) => {
 
 export const scanAllAudioFiles = async (
     token: string,
-    onPageLoaded: (newFiles: any[]) => void
-): Promise<any[]> => {
-    const allFiles: any[] = [];
+    onPageLoaded: (newFiles: DriveFile[]) => void
+): Promise<DriveFile[]> => {
+    const allFiles: DriveFile[] = [];
     let pageToken: string | undefined;
 
     do {
         const query = encodeURIComponent("mimeType contains 'audio/' and trashed=false");
         const url = `https://www.googleapis.com/drive/v3/files?q=${query}&fields=nextPageToken,files(id,name,mimeType,size,modifiedTime,parents)&pageSize=100${pageToken ? `&pageToken=${pageToken}` : ''}`;
-        
+
         const res = await fetch(url, {
             headers: { Authorization: `Bearer ${token}` }
         });
-        
+
         handleApiError(res);
         if (!res.ok) throw new Error('Failed to fetch from Drive');
-        
+
         const data = await res.json();
         const newFiles = data.files || [];
         allFiles.push(...newFiles);
         onPageLoaded(newFiles);
-        
+
         pageToken = data.nextPageToken;
     } while (pageToken);
 

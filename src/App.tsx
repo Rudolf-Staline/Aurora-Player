@@ -24,9 +24,9 @@ const pageVariants = {
   out: { opacity: 0, y: -10, filter: 'blur(4px)' }
 };
 
-const pageTransition: any = {
-  type: 'tween',
-  ease: 'easeOut',
+const pageTransition = {
+  type: 'tween' as const,
+  ease: 'easeOut' as const,
   duration: 0.25
 };
 

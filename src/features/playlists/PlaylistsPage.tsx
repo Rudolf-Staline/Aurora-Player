@@ -3,6 +3,7 @@ import { usePlaylistStore } from '../../store/usePlaylistStore';
 import { useNavigate } from 'react-router-dom';
 import { ListMusic, Plus, Play, MoreVertical, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { Track } from '../../store/usePlayerStore';
 
 export const PlaylistsPage: React.FC = () => {
   const { playlists, createPlaylist, deletePlaylist, playPlaylist } = usePlaylistStore();
@@ -20,7 +21,7 @@ export const PlaylistsPage: React.FC = () => {
     }
   };
 
-  const getMosaicArtworks = (tracks: any[]) => {
+  const getMosaicArtworks = (tracks: Track[]) => {
       const artworks = tracks.filter(t => t.artworkUrl).map(t => t.artworkUrl).slice(0, 4);
       while(artworks.length < 4 && artworks.length > 0) {
           artworks.push(artworks[0]);

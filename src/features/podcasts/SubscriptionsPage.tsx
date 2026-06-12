@@ -30,7 +30,7 @@ export const SubscriptionsPage: React.FC = () => {
                 const unplayedCount = episodes.filter(ep => !playedEpisodes[ep.id]).length;
                 newCounts[sub.collectionId] = unplayedCount;
              }
-         } catch (e) {
+         } catch {
              console.error(`Failed to fetch count for ${sub.collectionName}`);
          }
       }
@@ -61,7 +61,7 @@ export const SubscriptionsPage: React.FC = () => {
                 const episodeIds = episodes.map(ep => ep.id);
                 markAllAsPlayed(collectionId, episodeIds);
              }
-         } catch (e) {
+         } catch {
              console.error(`Failed to fetch episodes to mark as played`);
          }
   };

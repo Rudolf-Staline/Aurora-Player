@@ -15,7 +15,7 @@ export const LoginPage: React.FC = () => {
       setError('');
       try {
         await login(tokenResponse);
-      } catch (err: any) {
+      } catch {
         setError('Connexion échouée. Réessaie.');
         setLoading(false);
       }

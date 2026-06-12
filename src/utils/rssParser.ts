@@ -81,12 +81,12 @@ const parseXML = (xmlText: string, defaultArtwork?: string, podcastTitle?: strin
         const rawDescription = contentEncoded?.textContent || descriptionNode?.textContent || '';
         const cleanDescription = rawDescription.replace(/<[^>]*>?/gm, '');
 
-        let pubDateStr = item.querySelector('pubDate')?.textContent || '';
+        const pubDateStr = item.querySelector('pubDate')?.textContent || '';
         let pubDate = '';
         if (pubDateStr) {
             try {
                 pubDate = new Date(pubDateStr).toLocaleDateString();
-            } catch (e) {
+            } catch {
                 pubDate = pubDateStr;
             }
         }

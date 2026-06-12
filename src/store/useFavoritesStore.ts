@@ -14,7 +14,7 @@ interface FavoritesState {
 
 export const useFavoritesStore = create<FavoritesState>()(
   persist(
-    (set, _get) => ({
+    (set) => ({
       trackIds: [],
       episodeIds: [],
       podcastIds: [],

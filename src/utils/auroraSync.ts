@@ -11,7 +11,7 @@ const handleApiError = (res: Response) => {
     }
 };
 
-export const saveToCloud = async (filename: string, data: any): Promise<void> => {
+export const saveToCloud = async (filename: string, data: unknown): Promise<void> => {
     const token = localStorage.getItem('aurora_auth_token');
     if (!token) return;
 
@@ -58,7 +58,7 @@ export const saveToCloud = async (filename: string, data: any): Promise<void> =>
     }
 };
 
-export const loadFromCloud = async (filename: string): Promise<any | null> => {
+export const loadFromCloud = async <T = unknown>(filename: string): Promise<T | null> => {
     const token = localStorage.getItem('aurora_auth_token');
     if (!token) return null;
 
@@ -77,7 +77,7 @@ export const loadFromCloud = async (filename: string): Promise<any | null> => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             handleApiError(contentRes);
-            return await contentRes.json();
+            return await contentRes.json() as T;
         }
     } catch (e) {
         console.error(`Load failed for ${filename}`, e);
