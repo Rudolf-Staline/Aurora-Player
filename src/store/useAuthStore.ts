@@ -2,6 +2,8 @@ import { create } from 'zustand';
 
 interface TokenResponse {
   access_token: string;
+  scope?: string;
+  expires_in?: number;
   [key: string]: unknown;
 }
 
@@ -46,6 +48,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       localStorage.setItem('aurora_auth_token', access_token);
       localStorage.setItem('aurora_auth_user', JSON.stringify(user));
+      if (tokenResponse.scope) {
+        localStorage.setItem('aurora_auth_scope', tokenResponse.scope);
+      }
+      localStorage.removeItem('aurora_cloud_sync_disabled');
 
       set({ isConnected: true, accessToken: access_token, user });
     } catch (error) {
@@ -57,6 +63,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('aurora_auth_token');
     localStorage.removeItem('aurora_auth_user');
+    localStorage.removeItem('aurora_auth_scope');
+    localStorage.removeItem('aurora_cloud_sync_disabled');
     set({ isConnected: false, accessToken: null, user: null });
   },
 
