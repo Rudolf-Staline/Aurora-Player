@@ -69,7 +69,7 @@ export const BottomPlayer: React.FC = () => {
       initial={animationsEnabled ? { y: 72, opacity: 0 } : false}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 260, damping: 32 }}
-      className="pointer-events-none fixed inset-x-4 bottom-4 z-50 md:left-[20rem] md:right-5"
+      className="pointer-events-none fixed inset-x-4 bottom-4 z-50 md:inset-x-5"
     >
       <div className="pointer-events-auto mx-auto flex max-w-[980px] items-center gap-3 rounded-[1.5rem] border border-black/10 bg-[#fbf7f0]/94 p-2 shadow-[0_22px_60px_rgba(23,23,23,0.12)] backdrop-blur-xl">
         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[1.05rem] bg-black/5 shadow-sm">
@@ -124,7 +124,7 @@ export const BottomPlayer: React.FC = () => {
           <button onClick={handlePlayPause} className="flex h-10 w-10 items-center justify-center rounded-full bg-[#171717] text-[#f4efe7] md:hidden" aria-label="Lecture pause mobile">
             {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}
           </button>
-          <button onClick={() => toggleFavorite(currentTrack.id)} className={`hidden rounded-full p-2 transition-colors sm:block ${favorites.includes(currentTrack.id) ? 'bg-accent-rose/12 text-accent-rose' : 'text-text-muted hover:bg-black/5 hover:text-accent-rose'}`} aria-label="Ajouter aux favoris">
+          <button onClick={() => toggleFavorite(currentTrack.id)} className={`hidden rounded-full p-2 transition-colors sm:block ${favorites.includes(currentTrack.id) ? 'bg-accent-rose/[0.12] text-accent-rose' : 'text-text-muted hover:bg-black/5 hover:text-accent-rose'}`} aria-label="Ajouter aux favoris">
             <Heart size={17} fill={favorites.includes(currentTrack.id) ? 'currentColor' : 'none'} />
           </button>
           <button className={`relative rounded-full p-2 transition-colors ${showQueue ? 'bg-black text-[#f4efe7]' : 'text-text-muted hover:bg-black/5 hover:text-text-primary'}`} onClick={() => setShowQueue(!showQueue)} aria-label="Afficher la file">
