@@ -128,7 +128,7 @@ export const Library: React.FC = () => {
 
           <aside className="relative rounded-[2rem] bg-[#171717] p-6 text-[#f4efe7] lg:rounded-none lg:bg-transparent lg:p-0">
             <div className="grid h-full grid-rows-[1fr_auto] gap-6">
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/12 bg-[#f4efe7] p-4 text-[#171717] shadow-2xl lg:ml-8 lg:mt-4">
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.12] bg-[#f4efe7] p-4 text-[#171717] shadow-2xl lg:ml-8 lg:mt-4">
                 <img src={mockAlbums[0].coverUrl} alt="Featured mix" className="h-72 w-full rounded-[1.35rem] object-cover grayscale-[20%] md:h-80 lg:h-[350px]" />
                 <div className="mt-5 flex items-start justify-between gap-4">
                   <div>
@@ -136,7 +136,7 @@ export const Library: React.FC = () => {
                     <h2 className="mt-2 text-3xl font-black tracking-[-0.05em]">Morning Notes</h2>
                     <p className="mt-2 text-sm text-[#756c61]">A quiet mix for early work.</p>
                   </div>
-                  <button onClick={() => handlePlayDemo(mockAlbums[0])} className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-[#171717] text-[#f4efe7]">
+                  <button onClick={() => handlePlayDemo(mockAlbums[0])} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#171717] text-[#f4efe7]">
                     <Play size={20} fill="currentColor" className="ml-0.5" />
                   </button>
                 </div>
