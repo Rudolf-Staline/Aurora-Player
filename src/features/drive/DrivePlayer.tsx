@@ -148,10 +148,10 @@ export const DrivePlayer: React.FC = () => {
               <Cloud size={14} className="text-accent-primary" /> Google Drive
             </div>
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-text-primary md:text-6xl">
-              Ta bibliothèque Drive, <span className="text-accent-primary">prête à l’écoute</span>.
+              Bibliothèque <span className="text-accent-primary">connectée</span>.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-text-muted">
-              Omed scanne les fichiers audio, garde un cache léger et régénère les liens de lecture pour éviter les URLs expirées.
+              Diffuse tes fichiers audio Google Drive sans les déplacer.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <button
