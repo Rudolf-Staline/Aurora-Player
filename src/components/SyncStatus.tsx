@@ -3,48 +3,54 @@ import { Cloud, Loader2, CloudOff, CheckCircle } from 'lucide-react';
 import { requireDriveAuth } from '../utils/googleDriveApi';
 
 export const SyncStatus: React.FC = () => {
-    const [status, setStatus] = useState<'offline' | 'syncing' | 'synced' | 'connect'>(
-        localStorage.getItem('aurora_auth_token') ? 'synced' : 'connect'
-    );
+  const [status, setStatus] = useState<'offline' | 'syncing' | 'synced' | 'connect'>(
+    localStorage.getItem('aurora_auth_token') ? 'synced' : 'connect'
+  );
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const token = localStorage.getItem('aurora_auth_token');
-            if (token && status !== 'synced' && status !== 'syncing') {
-                setStatus('synced');
-            } else if (!token && status !== 'connect') {
-                setStatus('connect');
-            }
-        }, 2000);
-        return () => clearInterval(interval);
-    }, [status]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const token = localStorage.getItem('aurora_auth_token');
+      const disabled = localStorage.getItem('aurora_cloud_sync_disabled') === 'true';
+      if (disabled && status !== 'offline') {
+        setStatus('offline');
+      } else if (token && status !== 'synced' && status !== 'syncing') {
+        setStatus('synced');
+      } else if (!token && status !== 'connect') {
+        setStatus('connect');
+      }
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [status]);
 
-    const handleConnect = async () => {
-        setStatus('syncing');
-        const token = await requireDriveAuth();
-        if (token) {
-            setStatus('synced');
-        } else {
-            setStatus('connect');
-        }
-    };
+  const handleConnect = async () => {
+    setStatus('syncing');
+    const token = await requireDriveAuth();
+    if (token) setStatus('synced');
+    else setStatus('connect');
+  };
 
-    return (
-        <div 
-           className="flex items-center gap-2 p-2 mt-auto mx-2 rounded-lg bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
-           onClick={handleConnect}
-        >
-            {status === 'synced' && <CheckCircle size={16} className="text-accent-cyan" />}
-            {status === 'syncing' && <Loader2 size={16} className="animate-spin text-accent-cyan" />}
-            {status === 'offline' && <CloudOff size={16} className="text-accent-rose" />}
-            {status === 'connect' && <Cloud size={16} className="text-text-muted" />}
-            
-            <span className="text-xs font-medium text-text-muted">
-                {status === 'synced' && 'Synced'}
-                {status === 'syncing' && 'Syncing...'}
-                {status === 'offline' && 'Offline'}
-                {status === 'connect' && 'Connect Drive'}
-            </span>
-        </div>
-    );
+  const label = {
+    synced: 'Drive synchronisé',
+    syncing: 'Connexion...',
+    offline: 'Sync bloquée',
+    connect: 'Connecter Drive',
+  }[status];
+
+  return (
+    <button 
+      className="group flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.045] p-3 text-left transition-all hover:border-accent-cyan/30 hover:bg-white/[0.075]"
+      onClick={handleConnect}
+    >
+      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl transition-colors ${status === 'offline' ? 'bg-accent-rose/10 text-accent-rose' : status === 'synced' ? 'bg-accent-cyan/10 text-accent-cyan' : 'bg-white/10 text-text-muted'}`}>
+        {status === 'synced' && <CheckCircle size={17} />}
+        {status === 'syncing' && <Loader2 size={17} className="animate-spin" />}
+        {status === 'offline' && <CloudOff size={17} />}
+        {status === 'connect' && <Cloud size={17} />}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-xs font-black text-text-primary">{label}</span>
+        <span className="block truncate text-[10px] text-text-muted">Google Drive · appData</span>
+      </span>
+    </button>
+  );
 };
