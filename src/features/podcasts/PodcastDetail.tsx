@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Play, Loader2, ArrowLeft, Heart, RefreshCw, Bell, BellOff, CheckCircle } from 'lucide-react';
+import { Play, Loader2, ArrowLeft, Heart, RefreshCw, Bell, BellOff, CheckCircle, Inbox } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { parseRSSFeed, type PodcastEpisode } from '../../utils/rssParser';
 import { type Track } from '../../store/usePlayerStore';
@@ -7,15 +7,62 @@ import { usePodcastStore } from '../../store/usePodcastStore';
 import { useFavoritesStore } from '../../store/useFavoritesStore';
 import { audioEngine } from '../../core/audio_engine';
 
+interface PodcastDetailState {
+  podcast?: {
+    collectionId: number;
+    collectionName: string;
+    artistName: string;
+    artworkUrl600: string;
+    genres?: string[];
+    feedUrl?: string;
+  };
+}
+
+interface ItunesLookupResponse {
+  results?: unknown[];
+}
+
+interface ItunesLookupResult {
+  feedUrl?: string;
+}
+
+const INITIAL_VISIBLE_EPISODES = 100;
+const VISIBLE_EPISODE_INCREMENT = 50;
+
+const isLookupResult = (value: unknown): value is ItunesLookupResult => {
+  return Boolean(value && typeof value === 'object' && 'feedUrl' in value);
+};
+
+const buildItunesLookupUrl = (collectionId: number): string => {
+  const endpoint = `https://itunes.apple.com/lookup?id=${collectionId}&entity=podcast`;
+  return import.meta.env.DEV ? `/itunes-proxy/lookup?id=${collectionId}&entity=podcast` : `/api/proxy?url=${encodeURIComponent(endpoint)}`;
+};
+
+const resolvePodcastFeedUrl = async (collectionId: number, feedUrl?: string): Promise<string> => {
+  if (feedUrl?.trim()) return feedUrl;
+
+  const lookupResponse = await fetch(buildItunesLookupUrl(collectionId), { signal: AbortSignal.timeout(15000) });
+  if (!lookupResponse.ok) throw new Error('Failed to fetch podcast details from iTunes');
+
+  const lookupData = (await lookupResponse.json()) as ItunesLookupResponse;
+  const lookupResult = lookupData.results?.find(isLookupResult);
+
+  if (!lookupResult?.feedUrl) {
+    throw new Error('Podcast feed URL not found');
+  }
+
+  return lookupResult.feedUrl;
+};
+
 export const PodcastDetail: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const podcast = location.state?.podcast;
+  const podcast = (location.state as PodcastDetailState | null)?.podcast;
 
   const [episodes, setEpisodes] = useState<PodcastEpisode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [visibleCount, setVisibleCount] = useState(300);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_EPISODES);
   const { episodeIds: favorites, toggleEpisodeFavorite: toggleFavorite } = useFavoritesStore();
   const { isSubscribed, subscribe, unsubscribe, playedEpisodes, markAsPlayed } = usePodcastStore();
 
@@ -28,26 +75,14 @@ export const PodcastDetail: React.FC = () => {
 
     setLoading(true);
     setError('');
+    setVisibleCount(INITIAL_VISIBLE_EPISODES);
     
     try {
-      let feedUrl = podcast.feedUrl;
-
-      // If feedUrl is missing, try fetching it via lookup
-      if (!feedUrl) {
-        const lookupResponse = await fetch(`/itunes-proxy/lookup?id=${podcast.collectionId}&entity=podcast`);
-        if (!lookupResponse.ok) throw new Error('Failed to fetch podcast details from iTunes');
-        const lookupData = await lookupResponse.json();
-        
-        if (lookupData.results && lookupData.results.length > 0) {
-           feedUrl = lookupData.results[0].feedUrl;
-        } else {
-           throw new Error('Podcast feed URL not found');
-        }
-      }
-
+      const feedUrl = await resolvePodcastFeedUrl(podcast.collectionId, podcast.feedUrl);
       const data = await parseRSSFeed(feedUrl, podcast.artworkUrl600, podcast.collectionName);
       setEpisodes(data);
     } catch (err: unknown) {
+      setEpisodes([]);
       setError(err instanceof Error ? err.message : 'Failed to load episodes');
     } finally {
       setLoading(false);
@@ -112,7 +147,7 @@ export const PodcastDetail: React.FC = () => {
 
       <div className="flex flex-col md:flex-row gap-8 items-start">
         <div className="w-full md:w-1/3 max-w-sm sticky top-6">
-          <div className="aspect-square w-full rounded-2xl overflow-hidden shadow-2xl glow-cyan mb-6">
+          <div className="aspect-square w-full rounded-2xl overflow-hidden shadow-2xl glow-cyan mb-6 bg-white/5">
             <img src={podcast.artworkUrl600} alt={podcast.collectionName} className="w-full h-full object-cover" />
           </div>
           <h1 className="text-2xl font-display font-bold text-text-primary mb-2">{podcast.collectionName}</h1>
@@ -175,7 +210,15 @@ export const PodcastDetail: React.FC = () => {
             </div>
           )}
 
-          {!loading && !error && (
+          {!loading && !error && episodes.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 px-6 rounded-2xl bg-white/5 text-text-muted border border-white/5">
+              <Inbox size={42} className="mb-4 opacity-60" />
+              <p className="font-medium text-text-primary">Aucun épisode lisible trouvé</p>
+              <p className="text-sm mt-2 text-center max-w-md">Le flux existe peut-être, mais aucun épisode avec fichier audio n'a été détecté.</p>
+            </div>
+          )}
+
+          {!loading && !error && episodes.length > 0 && (
             <div className="space-y-4">
               {episodes.slice(0, visibleCount).map((episode) => {
                 const isPlayed = playedEpisodes[episode.id];
@@ -192,7 +235,7 @@ export const PodcastDetail: React.FC = () => {
                       <h3 className="font-semibold text-text-primary mb-1 line-clamp-2">{episode.title}</h3>
                       <p className="text-sm text-text-muted line-clamp-2 mb-3">{episode.description}</p>
                       <div className="flex items-center gap-4 text-xs font-mono text-text-muted">
-                        <span>{episode.pubDate}</span>
+                        {episode.pubDate && <span>{episode.pubDate}</span>}
                         {episode.duration > 0 && (
                           <span>{Math.floor(episode.duration / 60)} min</span>
                         )}
@@ -219,21 +262,19 @@ export const PodcastDetail: React.FC = () => {
                 );
               })}
               
-              {episodes.length > 0 && (
-                <div className="flex flex-col items-center pt-8 pb-4 gap-4">
-                  <span className="text-sm text-text-muted font-mono">
-                    Affichage de {Math.min(visibleCount, episodes.length)} sur {episodes.length} épisodes
-                  </span>
-                  {episodes.length > visibleCount && (
-                    <button 
-                      onClick={() => setVisibleCount(prev => prev + 50)}
-                      className="px-6 py-2 bg-white/5 hover:bg-white/10 text-text-primary rounded-xl font-medium transition-all shadow-lg hover:shadow-xl border border-white/5"
-                    >
-                      Afficher plus d'épisodes
-                    </button>
-                  )}
-                </div>
-              )}
+              <div className="flex flex-col items-center pt-8 pb-4 gap-4">
+                <span className="text-sm text-text-muted font-mono">
+                  Affichage de {Math.min(visibleCount, episodes.length)} sur {episodes.length} épisodes
+                </span>
+                {episodes.length > visibleCount && (
+                  <button 
+                    onClick={() => setVisibleCount(prev => prev + VISIBLE_EPISODE_INCREMENT)}
+                    className="px-6 py-2 bg-white/5 hover:bg-white/10 text-text-primary rounded-xl font-medium transition-all shadow-lg hover:shadow-xl border border-white/5"
+                  >
+                    Afficher plus d'épisodes
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>
