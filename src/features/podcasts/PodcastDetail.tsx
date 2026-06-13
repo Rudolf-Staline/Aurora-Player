@@ -119,7 +119,7 @@ export const PodcastDetail: React.FC = () => {
               collectionName: podcast.collectionName,
               artistName: podcast.artistName,
               artworkUrl600: podcast.artworkUrl600,
-              feedUrl: podcast.feedUrl
+              feedUrl: podcast.feedUrl ?? ''
           });
       }
   };
