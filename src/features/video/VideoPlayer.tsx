@@ -109,15 +109,13 @@ export const VideoPlayer: React.FC = () => {
 
   return (
     <div className="space-y-8 pb-10">
-      <section className="surface-card-strong aurora-ring relative overflow-hidden rounded-[2rem] p-6 md:p-8">
-        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent-violet/20 blur-3xl" />
-        <div className="absolute -bottom-28 left-16 h-72 w-72 rounded-full bg-accent-cyan/15 blur-3xl" />
+      <section className="surface-card-strong shadow-deep relative overflow-hidden rounded-[2rem] p-6 md:p-8">
         <div className="relative">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">
+          <div className="eyebrow mb-5 inline-flex items-center gap-2 text-accent-primary">
             <Clapperboard size={14} /> Mode cinéma
           </div>
-          <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-tight text-text-primary md:text-6xl">
-            Un lecteur vidéo local, avec une présence <span className="text-gradient-aurora">cinématique</span>.
+          <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-text-primary md:text-6xl">
+            Un lecteur vidéo local, d&rsquo;une présence <span className="text-accent-primary">cinématique</span>.
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-text-muted">
             Dépose un fichier, garde le contrôle sur la lecture, puis passe en plein écran ou Picture-in-Picture.
@@ -125,10 +123,10 @@ export const VideoPlayer: React.FC = () => {
         </div>
       </section>
 
-      <section className="surface-card rounded-[2rem] p-3 md:p-5">
-        <div 
+      <section className="surface-card shadow-deep rounded-[2rem] p-3 md:p-5">
+        <div
           ref={containerRef}
-          className={`relative aspect-video w-full overflow-hidden rounded-[1.75rem] bg-black shadow-2xl transition-all ${isDragging ? 'ring-2 ring-accent-cyan ring-offset-4 ring-offset-bg-primary' : 'glow-cyan'}`}
+          className={`shadow-deep relative aspect-video w-full overflow-hidden rounded-[1.75rem] bg-bg-primary transition-all ${isDragging ? 'border-premium-strong ring-1 ring-accent-primary/40' : 'border-premium'}`}
           onMouseMove={handleMouseMove}
           onMouseLeave={() => isPlaying && setShowControls(false)}
           onDragOver={onDragOver}
@@ -136,13 +134,13 @@ export const VideoPlayer: React.FC = () => {
           onDrop={onDrop}
         >
           {!videoSrc ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[1.75rem] border-2 border-dashed border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.025] p-8 text-center text-text-muted">
-              <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-accent-cyan/10 text-accent-cyan glow-cyan">
-                <Upload size={42} />
+            <div className="surface-secondary absolute inset-0 flex flex-col items-center justify-center rounded-[1.75rem] border border-dashed border-premium p-8 text-center text-text-muted">
+              <div className="border-premium mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-bg-elevated text-accent-primary">
+                <Upload size={40} strokeWidth={1.5} />
               </div>
-              <p className="text-xl font-black text-text-primary">Dépose une vidéo ici</p>
+              <p className="text-xl font-semibold text-text-primary">Dépose une vidéo ici</p>
               <p className="mb-6 mt-2 text-sm">ou sélectionne un fichier depuis ton ordinateur.</p>
-              <button onClick={handleInputClick} className="command-button rounded-2xl px-6 py-3 text-sm font-black">
+              <button onClick={handleInputClick} className="btn-secondary rounded-2xl px-6 py-3 text-sm">
                 Parcourir les fichiers
               </button>
               <input type="file" ref={fileInputRef} onChange={handleInputChange} accept="video/*" className="hidden" />
@@ -150,37 +148,37 @@ export const VideoPlayer: React.FC = () => {
           ) : (
             <>
               <video ref={videoRef} src={videoSrc} className="h-full w-full object-cover" onTimeUpdate={handleTimeUpdate} onEnded={() => setIsPlaying(false)} onClick={togglePlay} />
-              <div className={`absolute inset-x-0 bottom-0 p-4 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
-                <div className="surface-card mx-auto rounded-[1.5rem] p-4">
-                  <h3 className="mb-3 line-clamp-1 text-sm font-black text-text-primary">{videoTitle}</h3>
+              <div className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg-primary/90 to-transparent p-4 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+                <div className="surface-card-strong mx-auto rounded-[1.5rem] p-4">
+                  <h3 className="eyebrow mb-3 line-clamp-1 text-text-muted">{videoTitle}</h3>
                   <div className="flex items-center gap-3">
                     <span className="w-10 text-right font-mono text-xs text-text-muted">{formatTime(currentTime)}</span>
-                    <div className="relative h-2 flex-1 cursor-pointer overflow-hidden rounded-full bg-white/15" onClick={handleProgressClick}>
-                      <div className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-accent-cyan to-accent-violet" style={{ width: `${progress}%` }} />
+                    <div className="relative h-1.5 flex-1 cursor-pointer overflow-hidden rounded-full bg-bg-elevated" onClick={handleProgressClick}>
+                      <div className="absolute left-0 top-0 h-full rounded-full bg-accent-primary" style={{ width: `${progress}%` }} />
                     </div>
                     <span className="w-10 font-mono text-xs text-text-muted">{formatTime(duration)}</span>
                   </div>
                   <div className="mt-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <button onClick={togglePlay} className="command-button flex h-12 w-12 items-center justify-center rounded-full">
-                        {isPlaying ? <Pause size={22} fill="currentColor" /> : <Play size={22} fill="currentColor" className="ml-0.5" />}
+                      <button onClick={togglePlay} className="btn-primary flex h-12 w-12 items-center justify-center rounded-full">
+                        {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-0.5" />}
                       </button>
-                      <button onClick={toggleMute} className="rounded-2xl bg-white/10 p-3 text-text-primary transition-colors hover:bg-white/15">
+                      <button onClick={toggleMute} className="border-premium rounded-2xl bg-bg-elevated p-3 text-text-primary transition-colors hover:bg-bg-secondary">
                         {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
                       </button>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={handleInputClick} className="rounded-2xl bg-white/10 p-3 text-text-primary transition-colors hover:bg-white/15" title="Changer de vidéo"><Upload size={19} /></button>
-                      <button onClick={togglePiP} className="rounded-2xl bg-white/10 p-3 text-text-primary transition-colors hover:bg-white/15" title="Picture in Picture"><PictureInPicture size={19} /></button>
-                      <button onClick={toggleFullScreen} className="rounded-2xl bg-white/10 p-3 text-text-primary transition-colors hover:bg-white/15" title="Plein écran"><Maximize size={19} /></button>
+                      <button onClick={handleInputClick} className="border-premium rounded-2xl bg-bg-elevated p-3 text-text-primary transition-colors hover:bg-bg-secondary" title="Changer de vidéo"><Upload size={19} /></button>
+                      <button onClick={togglePiP} className="border-premium rounded-2xl bg-bg-elevated p-3 text-text-primary transition-colors hover:bg-bg-secondary" title="Picture in Picture"><PictureInPicture size={19} /></button>
+                      <button onClick={toggleFullScreen} className="border-premium rounded-2xl bg-bg-elevated p-3 text-text-primary transition-colors hover:bg-bg-secondary" title="Plein écran"><Maximize size={19} /></button>
                     </div>
                   </div>
                 </div>
               </div>
               {!isPlaying && (
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <div className="surface-card flex h-24 w-24 items-center justify-center rounded-full glow-cyan">
-                    <Play size={48} className="ml-2 text-accent-cyan" fill="currentColor" />
+                  <div className="surface-card-strong shadow-deep flex h-24 w-24 items-center justify-center rounded-full">
+                    <Play size={44} className="ml-2 text-accent-primary" fill="currentColor" />
                   </div>
                 </div>
               )}

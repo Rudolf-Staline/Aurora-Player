@@ -104,50 +104,47 @@ export const PodcastSearch: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <section className="surface-card-strong aurora-ring relative overflow-hidden rounded-[2rem] p-6 md:p-8">
-        <div className="absolute -right-20 -top-28 h-80 w-80 rounded-full bg-accent-cyan/15 blur-3xl" />
-        <div className="absolute -bottom-28 left-10 h-80 w-80 rounded-full bg-accent-violet/15 blur-3xl" />
-
+      <section className="surface-card-strong aurora-ring relative overflow-hidden p-6 md:p-8">
         <div className="relative grid gap-8 lg:grid-cols-[1fr_0.7fr] lg:items-end">
           <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">
-              <Radio size={14} /> Podcast studio
+            <div className="eyebrow mb-5 inline-flex items-center gap-2">
+              <Radio size={13} /> Podcast studio
             </div>
-            <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-tight text-text-primary md:text-6xl">
-              Trouve les émissions qui méritent vraiment ton <span className="text-gradient-aurora">attention</span>.
+            <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-text-primary md:text-6xl">
+              Trouve les émissions qui méritent vraiment ton <span className="text-accent-primary">attention</span>.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-text-muted">
               Recherche sur iTunes, ouvre les flux RSS et ajoute les podcasts à ton espace Omed sans perdre le fil.
             </p>
           </div>
 
-          <form onSubmit={handleSearch} className="surface-card rounded-[1.75rem] p-3">
+          <form onSubmit={handleSearch} className="surface-secondary rounded-2xl p-2.5">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={21} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={20} />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Rechercher un podcast, un sujet, une voix..."
-                className="w-full rounded-2xl border border-white/10 bg-black/20 py-4 pl-12 pr-28 text-text-primary placeholder:text-text-muted focus:border-accent-cyan/50 focus:outline-none focus:ring-2 focus:ring-accent-cyan/20"
+                className="border-premium w-full rounded-xl bg-bg-primary py-4 pl-12 pr-28 text-text-primary placeholder:text-text-muted focus:border-accent-primary/40 focus:outline-none focus:ring-1 focus:ring-accent-primary/20"
               />
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading || !query.trim()}
-                className="command-button absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-xl px-4 py-2 text-sm font-black transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-primary absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {loading ? <Loader2 size={16} className="animate-spin" /> : 'Search'}
+                {loading ? <Loader2 size={16} className="animate-spin" /> : 'Rechercher'}
               </button>
             </div>
           </form>
         </div>
       </section>
 
-      {error && <div className="rounded-3xl border border-accent-rose/20 bg-accent-rose/10 p-4 text-accent-rose">{error}</div>}
+      {error && <div className="border-premium rounded-2xl bg-danger/10 p-4 text-sm text-text-primary"><span className="text-danger">{error}</span></div>}
 
       {loading && results.length === 0 && (
-        <div className="surface-card flex items-center gap-3 rounded-3xl p-5 text-text-muted">
-          <Loader2 size={20} className="animate-spin text-accent-cyan" />
+        <div className="surface-card flex items-center gap-3 p-5 text-text-muted">
+          <Loader2 size={20} className="animate-spin text-accent-primary" />
           <span>Recherche de podcasts en cours...</span>
         </div>
       )}

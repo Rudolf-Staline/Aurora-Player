@@ -30,14 +30,18 @@ const pageTransition = {
   duration: 0.22
 };
 
-const themeTokens: Record<string, { cyan: string; violet: string; bg: string; glow: string }> = {
-  aurora: { cyan: '#171717', violet: '#9b6b43', bg: '#f4efe7', glow: '0 18px 44px rgba(23,23,23,0.10)' },
-  sunset: { cyan: '#171717', violet: '#b85c38', bg: '#f7eee4', glow: '0 18px 44px rgba(184,92,56,0.12)' },
-  forest: { cyan: '#15261d', violet: '#657a52', bg: '#eef2e8', glow: '0 18px 44px rgba(21,38,29,0.10)' },
-  ocean: { cyan: '#123244', violet: '#5b6f7a', bg: '#edf3f4', glow: '0 18px 44px rgba(18,50,68,0.10)' },
-  neon: { cyan: '#171717', violet: '#b08a36', bg: '#f5f0df', glow: '0 18px 44px rgba(176,138,54,0.12)' },
-  midnight: { cyan: '#f4efe7', violet: '#b89b72', bg: '#111111', glow: '0 18px 44px rgba(244,239,231,0.08)' },
-  peach: { cyan: '#171717', violet: '#b76e65', bg: '#f8eee9', glow: '0 18px 44px rgba(183,110,101,0.12)' },
+// Nocturne Luxe — every theme stays on a deep Obsidian ground, only the
+// Champagne/Copper accent shifts subtly. No neon, no light surfaces.
+const OBSIDIAN = '#0F0F10';
+const DEEP_SHADOW = '0 24px 60px rgba(0,0,0,0.55)';
+const themeTokens: Record<string, { primary: string; secondary: string; bg: string; glow: string }> = {
+  aurora: { primary: '#C6A77B', secondary: '#9D6F49', bg: OBSIDIAN, glow: DEEP_SHADOW },
+  sunset: { primary: '#CDA579', secondary: '#A66C45', bg: OBSIDIAN, glow: DEEP_SHADOW },
+  forest: { primary: '#BBA877', secondary: '#7E8157', bg: OBSIDIAN, glow: DEEP_SHADOW },
+  ocean: { primary: '#B7AE8E', secondary: '#6F7F84', bg: OBSIDIAN, glow: DEEP_SHADOW },
+  neon: { primary: '#CDAE6E', secondary: '#A8803F', bg: OBSIDIAN, glow: DEEP_SHADOW },
+  midnight: { primary: '#CBB089', secondary: '#8C6B4E', bg: OBSIDIAN, glow: DEEP_SHADOW },
+  peach: { primary: '#CDA579', secondary: '#A66C45', bg: OBSIDIAN, glow: DEEP_SHADOW },
 };
 
 const AnimatedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -76,10 +80,13 @@ function App() {
     
     const root = document.documentElement;
     const tokens = themeTokens[theme] ?? themeTokens.aurora;
-    root.style.setProperty('--accent-cyan', tokens.cyan);
-    root.style.setProperty('--accent-violet', tokens.violet);
+    root.style.setProperty('--accent-primary', tokens.primary);
+    root.style.setProperty('--accent-secondary', tokens.secondary);
+    root.style.setProperty('--accent-cyan', tokens.primary);
+    root.style.setProperty('--accent-violet', tokens.secondary);
     root.style.setProperty('--bg-primary', tokens.bg);
     root.style.setProperty('--glow-cyan', tokens.glow);
+    root.style.setProperty('--glow-violet', tokens.glow);
   }, [theme, density]);
 
   if (!isConnected) {

@@ -141,34 +141,32 @@ export const DrivePlayer: React.FC = () => {
 
   return (
     <div className="space-y-8 pb-10">
-      <section className="surface-card-strong aurora-ring relative overflow-hidden rounded-[2rem] p-6 md:p-8">
-        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent-cyan/20 blur-3xl" />
-        <div className="absolute -bottom-28 left-12 h-72 w-72 rounded-full bg-accent-violet/15 blur-3xl" />
+      <section className="surface-card-strong shadow-deep relative overflow-hidden rounded-[2rem] p-6 md:p-8">
         <div className="relative grid gap-8 lg:grid-cols-[1fr_0.65fr] lg:items-end">
           <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">
-              <Cloud size={14} /> Google Drive
+            <div className="eyebrow mb-5 inline-flex items-center gap-2 text-text-muted">
+              <Cloud size={14} className="text-accent-primary" /> Google Drive
             </div>
-            <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-tight text-text-primary md:text-6xl">
-              Tes fichiers Drive, prêts à être <span className="text-gradient-aurora">streamés</span>.
+            <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-text-primary md:text-6xl">
+              Ta bibliothèque Drive, <span className="text-accent-primary">prête à l’écoute</span>.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-text-muted">
               Omed scanne les fichiers audio, garde un cache léger et régénère les liens de lecture pour éviter les URLs expirées.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <button 
+              <button
                 onClick={token ? loadLibrary : handleConnect}
                 disabled={isScanning}
-                className="command-button inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-black transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-primary inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isScanning ? <Loader2 size={18} className="animate-spin" /> : <RefreshCw size={18} />}
                 {token ? 'Scanner maintenant' : 'Connecter Drive'}
               </button>
               {token && (
-                <button 
+                <button
                   onClick={handleConnect}
                   disabled={isScanning}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-accent-cyan/20 bg-accent-cyan/10 px-5 py-3 text-sm font-bold text-accent-cyan transition-colors hover:bg-accent-cyan/20 disabled:opacity-50"
+                  className="btn-secondary inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold disabled:opacity-50"
                 >
                   <ShieldCheck size={18} /> Reconnecter
                 </button>
@@ -176,65 +174,72 @@ export const DrivePlayer: React.FC = () => {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3 lg:grid-cols-1">
-            <div className="rounded-3xl bg-black/20 p-4 ring-1 ring-white/10">
-              <p className="text-3xl font-black text-text-primary">{files.length}</p>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">Audios</p>
+            <div className="surface-secondary border-premium rounded-2xl p-4">
+              <p className="text-3xl font-semibold text-text-primary">{files.length}</p>
+              <p className="eyebrow mt-1 text-text-muted">Audios</p>
             </div>
-            <div className="rounded-3xl bg-black/20 p-4 ring-1 ring-white/10">
-              <p className="text-3xl font-black text-text-primary">{formatSize(totalSize)}</p>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">Taille</p>
+            <div className="surface-secondary border-premium rounded-2xl p-4">
+              <p className="text-3xl font-semibold text-text-primary">{formatSize(totalSize)}</p>
+              <p className="eyebrow mt-1 text-text-muted">Taille</p>
             </div>
-            <div className="rounded-3xl bg-black/20 p-4 ring-1 ring-white/10">
-              <p className="text-lg font-black text-text-primary">{token ? 'Connecté' : 'Off'}</p>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">État</p>
+            <div className="surface-secondary border-premium rounded-2xl p-4">
+              <p className="inline-flex items-center gap-2 text-lg font-semibold text-text-primary">
+                {token && <span className="h-2 w-2 rounded-full bg-accent-primary" />}
+                {token ? 'Connecté' : 'Hors ligne'}
+              </p>
+              <p className="eyebrow mt-1 text-text-muted">État</p>
             </div>
           </div>
         </div>
       </section>
 
       {lastScanned && (
-        <div className="surface-card flex items-center gap-3 rounded-3xl p-4 text-sm text-text-muted">
-          <HardDrive size={18} className="text-accent-cyan" /> Dernier scan : {new Date(lastScanned).toLocaleString()}
+        <div className="surface-card border-premium flex items-center gap-3 rounded-2xl p-4 text-sm text-text-muted">
+          <HardDrive size={18} className="text-accent-primary" /> Dernier scan : {new Date(lastScanned).toLocaleString()}
         </div>
       )}
 
       {!token ? (
         <section className="surface-card flex min-h-[360px] flex-col items-center justify-center rounded-[2rem] p-8 text-center">
-          <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-[2rem] bg-accent-cyan/10 text-accent-cyan">
+          <div className="border-premium mb-5 flex h-20 w-20 items-center justify-center rounded-[2rem] bg-bg-elevated text-accent-primary">
             <Cloud size={40} />
           </div>
-          <h2 className="text-2xl font-black text-text-primary">Connecte Google Drive</h2>
+          <h2 className="text-2xl font-semibold text-text-primary">Connecte Google Drive</h2>
           <p className="mt-3 max-w-md text-sm leading-6 text-text-muted">
             L’app demande la lecture Drive pour streamer tes audios et l’accès appData pour synchroniser les métadonnées Omed.
           </p>
-          <button onClick={handleConnect} disabled={isScanning} className="command-button mt-6 inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-black disabled:opacity-50">
+          <button onClick={handleConnect} disabled={isScanning} className="btn-primary mt-6 inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold disabled:opacity-50">
             {isScanning ? <Loader2 size={18} className="animate-spin" /> : <Cloud size={18} />}
             Connecter le compte
           </button>
-          {error && <p className="mt-4 text-sm text-accent-rose">{error}</p>}
+          {error && (
+            <p className="border-premium mt-5 inline-flex max-w-md rounded-2xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
+              {error}
+            </p>
+          )}
         </section>
       ) : (
         <section className="surface-card rounded-[2rem] p-4 md:p-6">
           {isScanning && (
-            <div className="mb-5 flex items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-text-muted">
-              <Loader2 size={16} className="animate-spin text-accent-cyan" />
+            <div className="surface-secondary border-premium mb-5 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm text-text-muted">
+              <Loader2 size={16} className="animate-spin text-accent-primary" />
               <span>{scanProgress > 0 ? `Scan en cours — ${scanProgress} fichiers trouvés` : 'Initialisation du scan...'}</span>
-              <div className="ml-2 h-1 flex-1 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full w-full animate-pulse rounded-full bg-accent-cyan" />
+              <div className="ml-2 h-1 flex-1 overflow-hidden rounded-full bg-bg-elevated">
+                <div className="h-full w-full animate-pulse rounded-full bg-accent-primary" />
               </div>
             </div>
           )}
 
           {error ? (
-            <div className="rounded-3xl border border-accent-rose/20 bg-accent-rose/10 p-4 text-accent-rose">{error}</div>
+            <div className="border-premium rounded-2xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">{error}</div>
           ) : files.length === 0 && isFirstLoad ? (
             <div className="space-y-3">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 rounded-3xl bg-white/[0.035] p-4">
-                  <div className="h-12 w-12 animate-pulse rounded-2xl bg-white/5" />
+                <div key={i} className="surface-secondary flex items-center gap-4 rounded-2xl p-4">
+                  <div className="h-12 w-12 animate-pulse rounded-xl bg-bg-elevated" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-3 w-3/4 animate-pulse rounded bg-white/5" />
-                    <div className="h-2 w-1/2 animate-pulse rounded bg-white/5" />
+                    <div className="h-3 w-3/4 animate-pulse rounded bg-bg-elevated" />
+                    <div className="h-2 w-1/2 animate-pulse rounded bg-bg-elevated" />
                   </div>
                 </div>
               ))}
@@ -242,7 +247,7 @@ export const DrivePlayer: React.FC = () => {
           ) : files.length === 0 && !isScanning ? (
             <div className="flex flex-col items-center justify-center gap-4 py-20 text-center text-text-muted">
               <Music size={52} className="opacity-25" />
-              <h2 className="text-xl font-black text-text-primary">Aucun fichier audio trouvé</h2>
+              <h2 className="text-xl font-semibold text-text-primary">Aucun fichier audio trouvé</h2>
               <p className="max-w-md text-sm">Ajoute des fichiers audio dans ton Drive, puis relance un scan.</p>
             </div>
           ) : (

@@ -32,15 +32,14 @@ export const HistoryPage: React.FC = () => {
 
   return (
     <div className="space-y-8 pb-10">
-      <section className="surface-card-strong aurora-ring relative overflow-hidden rounded-[2rem] p-6 md:p-8">
-        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent-cyan/15 blur-3xl" />
-        <div className="absolute -bottom-28 left-12 h-72 w-72 rounded-full bg-accent-violet/15 blur-3xl" />
+      <section className="surface-card-strong relative overflow-hidden rounded-[2rem] p-6 md:p-8">
+        <div className="absolute -right-32 -top-32 h-72 w-72 rounded-full bg-accent-primary/[0.05] blur-3xl" />
         <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border-premium bg-bg-secondary px-3 py-1 eyebrow">
               <History size={14} /> Historique
             </div>
-            <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-tight text-text-primary md:text-6xl">
+            <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-[-0.03em] text-text-primary md:text-6xl">
               Ce que tu as écouté, <span className="text-gradient-aurora">sans perdre le fil</span>.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-text-muted">
@@ -48,16 +47,16 @@ export const HistoryPage: React.FC = () => {
             </p>
           </div>
           <div className="grid grid-cols-3 gap-3 sm:w-[28rem]">
-            <div className="rounded-3xl bg-black/20 p-4 ring-1 ring-white/10">
-              <p className="text-3xl font-black text-text-primary">{history.length}</p>
+            <div className="rounded-3xl border-premium bg-bg-secondary p-4">
+              <p className="text-3xl font-semibold text-text-primary">{history.length}</p>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">Total</p>
             </div>
-            <div className="rounded-3xl bg-black/20 p-4 ring-1 ring-white/10">
-              <p className="text-3xl font-black text-text-primary">{driveCount}</p>
+            <div className="rounded-3xl border-premium bg-bg-secondary p-4">
+              <p className="text-3xl font-semibold text-text-primary">{driveCount}</p>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">Drive</p>
             </div>
-            <div className="rounded-3xl bg-black/20 p-4 ring-1 ring-white/10">
-              <p className="text-3xl font-black text-text-primary">{podcastCount}</p>
+            <div className="rounded-3xl border-premium bg-bg-secondary p-4">
+              <p className="text-3xl font-semibold text-text-primary">{podcastCount}</p>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">Podcasts</p>
             </div>
           </div>
