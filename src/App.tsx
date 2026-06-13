@@ -19,25 +19,25 @@ import { LoginPage } from './features/auth/LoginPage';
 import { Toaster } from 'react-hot-toast';
 
 const pageVariants = {
-  initial: { opacity: 0, y: 16, scale: 0.985, filter: 'blur(8px)' },
-  in: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' },
-  out: { opacity: 0, y: -12, scale: 0.992, filter: 'blur(8px)' }
+  initial: { opacity: 0, y: 12 },
+  in: { opacity: 1, y: 0 },
+  out: { opacity: 0, y: -8 }
 };
 
 const pageTransition = {
   type: 'tween' as const,
   ease: 'easeOut' as const,
-  duration: 0.28
+  duration: 0.22
 };
 
 const themeTokens: Record<string, { cyan: string; violet: string; bg: string; glow: string }> = {
-  sunset: { cyan: '#fb923c', violet: '#f472b6', bg: '#12070b', glow: '0 18px 65px rgba(251,146,60,0.24)' },
-  forest: { cyan: '#34d399', violet: '#facc15', bg: '#03120d', glow: '0 18px 65px rgba(52,211,153,0.24)' },
-  ocean: { cyan: '#38bdf8', violet: '#60a5fa', bg: '#04111f', glow: '0 18px 65px rgba(56,189,248,0.24)' },
-  neon: { cyan: '#fde047', violet: '#f472b6', bg: '#08070a', glow: '0 18px 65px rgba(253,224,71,0.22)' },
-  midnight: { cyan: '#818cf8', violet: '#2dd4bf', bg: '#020617', glow: '0 18px 65px rgba(129,140,248,0.24)' },
-  peach: { cyan: '#fb7185', violet: '#fdba74', bg: '#17080d', glow: '0 18px 65px rgba(251,113,133,0.24)' },
-  aurora: { cyan: '#7dd3fc', violet: '#c084fc', bg: '#050712', glow: '0 18px 65px rgba(125,211,252,0.24)' },
+  aurora: { cyan: '#171717', violet: '#9b6b43', bg: '#f4efe7', glow: '0 18px 44px rgba(23,23,23,0.10)' },
+  sunset: { cyan: '#171717', violet: '#b85c38', bg: '#f7eee4', glow: '0 18px 44px rgba(184,92,56,0.12)' },
+  forest: { cyan: '#15261d', violet: '#657a52', bg: '#eef2e8', glow: '0 18px 44px rgba(21,38,29,0.10)' },
+  ocean: { cyan: '#123244', violet: '#5b6f7a', bg: '#edf3f4', glow: '0 18px 44px rgba(18,50,68,0.10)' },
+  neon: { cyan: '#171717', violet: '#b08a36', bg: '#f5f0df', glow: '0 18px 44px rgba(176,138,54,0.12)' },
+  midnight: { cyan: '#f4efe7', violet: '#b89b72', bg: '#111111', glow: '0 18px 44px rgba(244,239,231,0.08)' },
+  peach: { cyan: '#171717', violet: '#b76e65', bg: '#f8eee9', glow: '0 18px 44px rgba(183,110,101,0.12)' },
 };
 
 const AnimatedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
