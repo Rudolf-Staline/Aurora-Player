@@ -1,11 +1,10 @@
 import React, { useCallback, useState } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Repeat, Shuffle, Heart, ListMusic } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Repeat, Shuffle, Heart, ListMusic, Music2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePlayerStore } from '../store/usePlayerStore';
 import { useFavoritesStore } from '../store/useFavoritesStore';
 import { audioEngine } from '../core/audio_engine';
 import { QueuePanel } from './QueuePanel';
-
 import { useSettingsStore } from '../store/useSettingsStore';
 
 export const BottomPlayer: React.FC = () => {
@@ -44,151 +43,109 @@ export const BottomPlayer: React.FC = () => {
     audioEngine.setVolume(newVolume);
   }, []);
 
+  if (!currentTrack) {
+    return (
+      <motion.div
+        initial={animationsEnabled ? { y: 24, opacity: 0 } : false}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.2 }}
+        className="pointer-events-none fixed bottom-4 right-4 z-50 hidden md:block"
+      >
+        <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-black/10 bg-[#fbf7f0]/92 px-4 py-3 text-text-muted shadow-[0_18px_44px_rgba(23,23,23,0.10)] backdrop-blur-md">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#171717] text-[#f4efe7]">
+            <Music2 size={16} />
+          </span>
+          <div className="pr-1">
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em]">Player en veille</p>
+            <p className="text-xs">Choisis un titre pour afficher les contrôles.</p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div 
-      initial={animationsEnabled ? { y: 120, opacity: 0 } : false}
+      initial={animationsEnabled ? { y: 72, opacity: 0 } : false}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 260, damping: 30 }}
-      className="pointer-events-none fixed inset-x-3 bottom-3 z-50 md:left-[20rem] md:right-4"
+      transition={{ type: 'spring', stiffness: 260, damping: 32 }}
+      className="pointer-events-none fixed inset-x-4 bottom-4 z-50 md:left-[20rem] md:right-5"
     >
-      <div className="pointer-events-auto surface-card-strong aurora-ring mx-auto flex max-w-[1220px] flex-col gap-3 rounded-[2rem] p-3 md:flex-row md:items-center md:gap-5 md:px-4">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-white/10 shadow-lg shadow-black/30 md:h-16 md:w-16">
-            {currentTrack?.artworkUrl ? (
-              <img src={currentTrack.artworkUrl} alt={currentTrack.album} className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-cyan/25 to-accent-violet/25">
-                <div className="h-7 w-7 rounded-full border border-white/30" />
-              </div>
-            )}
-            {isPlaying && <div className="absolute inset-x-3 bottom-2 h-1 rounded-full bg-gradient-to-r from-accent-cyan to-accent-violet" />}
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent-cyan">
-              {isPlaying ? 'Lecture en cours' : 'Prêt à jouer'}
-            </p>
-            <h4 className="line-clamp-1 text-sm font-black text-text-primary md:text-base">
-              {currentTrack?.title || 'Aucun titre sélectionné'}
-            </h4>
-            <p className="line-clamp-1 text-xs text-text-muted">
-              {currentTrack?.artist || 'Choisis un morceau, un podcast ou un fichier Drive'}
-            </p>
-          </div>
-
-          {currentTrack && (
-            <button 
-              onClick={() => toggleFavorite(currentTrack.id)}
-              className={`hidden h-10 w-10 items-center justify-center rounded-2xl transition-all sm:flex ${favorites.includes(currentTrack.id) ? 'bg-accent-rose/15 text-accent-rose' : 'bg-white/5 text-text-muted hover:text-accent-rose'}`}
-              aria-label="Ajouter aux favoris"
-            >
-              <Heart size={18} fill={favorites.includes(currentTrack.id) ? 'currentColor' : 'none'} />
-            </button>
+      <div className="pointer-events-auto mx-auto flex max-w-[980px] items-center gap-3 rounded-[1.5rem] border border-black/10 bg-[#fbf7f0]/94 p-2 shadow-[0_22px_60px_rgba(23,23,23,0.12)] backdrop-blur-xl">
+        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[1.05rem] bg-black/5 shadow-sm">
+          {currentTrack.artworkUrl ? (
+            <img src={currentTrack.artworkUrl} alt={currentTrack.album} className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-[#171717] text-[#f4efe7]">
+              <Music2 size={18} />
+            </div>
           )}
         </div>
 
-        <div className="flex min-w-0 flex-[1.15] flex-col items-center gap-3">
-          <div className="flex items-center gap-3 md:gap-5">
-            <button 
-              onClick={toggleShuffle}
-              className={`relative flex h-10 w-10 items-center justify-center rounded-2xl transition-all ${isShuffle ? 'bg-accent-cyan/15 text-accent-cyan' : 'text-text-muted hover:bg-white/10 hover:text-text-primary'}`}
-              aria-label="Shuffle"
-            >
-              <Shuffle size={18} />
+        <div className="min-w-0 flex-[1.1]">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-text-muted">
+            {isPlaying ? 'Lecture' : 'En pause'}
+          </p>
+          <h4 className="line-clamp-1 text-sm font-black tracking-[-0.02em] text-text-primary">
+            {currentTrack.title}
+          </h4>
+          <p className="line-clamp-1 text-xs text-text-muted">{currentTrack.artist}</p>
+        </div>
+
+        <div className="hidden min-w-[260px] flex-col gap-2 md:flex">
+          <div className="flex items-center justify-center gap-2">
+            <button onClick={toggleShuffle} className={`rounded-full p-2 transition-colors ${isShuffle ? 'bg-black text-[#f4efe7]' : 'text-text-muted hover:bg-black/5 hover:text-text-primary'}`} aria-label="Shuffle">
+              <Shuffle size={16} />
             </button>
-            <button 
-              onClick={playPrevious}
-              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-text-primary transition-all hover:bg-white/10 hover:text-accent-cyan"
-              aria-label="Titre précédent"
-            >
-              <SkipBack size={20} fill="currentColor" />
+            <button onClick={playPrevious} className="rounded-full p-2 text-text-primary transition-colors hover:bg-black/5" aria-label="Titre précédent">
+              <SkipBack size={18} fill="currentColor" />
             </button>
-            <button 
-              onClick={handlePlayPause}
-              disabled={!currentTrack}
-              className={`command-button flex h-14 w-14 items-center justify-center rounded-full text-bg-primary transition-transform ${currentTrack ? 'hover:scale-105 active:scale-95' : 'cursor-not-allowed opacity-45'}`}
-              aria-label="Lecture pause"
-            >
-              {isPlaying ? (
-                <Pause size={23} fill="currentColor" />
-              ) : (
-                <Play size={23} fill="currentColor" className="ml-1" />
-              )}
+            <button onClick={handlePlayPause} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#171717] text-[#f4efe7] shadow-[0_12px_24px_rgba(23,23,23,0.16)]" aria-label="Lecture pause">
+              {isPlaying ? <Pause size={19} fill="currentColor" /> : <Play size={19} fill="currentColor" className="ml-0.5" />}
             </button>
-            <button 
-              onClick={playNext}
-              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-text-primary transition-all hover:bg-white/10 hover:text-accent-cyan"
-              aria-label="Titre suivant"
-            >
-              <SkipForward size={20} fill="currentColor" />
+            <button onClick={playNext} className="rounded-full p-2 text-text-primary transition-colors hover:bg-black/5" aria-label="Titre suivant">
+              <SkipForward size={18} fill="currentColor" />
             </button>
-            <button 
-              onClick={toggleRepeatMode}
-              className={`relative flex h-10 w-10 items-center justify-center rounded-2xl transition-all ${repeatMode !== 'none' ? 'bg-accent-cyan/15 text-accent-cyan' : 'text-text-muted hover:bg-white/10 hover:text-text-primary'}`}
-              aria-label="Répétition"
-            >
-              <Repeat size={18} />
-              {repeatMode === 'one' && <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent-cyan text-[9px] font-black text-bg-primary">1</span>}
+            <button onClick={toggleRepeatMode} className={`relative rounded-full p-2 transition-colors ${repeatMode !== 'none' ? 'bg-black text-[#f4efe7]' : 'text-text-muted hover:bg-black/5 hover:text-text-primary'}`} aria-label="Répétition">
+              <Repeat size={16} />
+              {repeatMode === 'one' && <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#9b6b43] text-[9px] font-black text-white">1</span>}
             </button>
           </div>
-
-          <div className="flex w-full max-w-xl items-center gap-3">
-            <span className="w-10 text-right font-mono text-[11px] text-text-muted">{formatTime(currentTime)}</span>
-            <div 
-              className="relative h-2 flex-1 cursor-pointer overflow-hidden rounded-full bg-white/10"
-              onClick={handleProgressClick}
-            >
-              <div 
-                className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-accent-cyan to-accent-violet shadow-[0_0_20px_rgba(125,211,252,0.35)]"
-                style={{ width: `${progress * 100}%` }}
-              />
+          <div className="flex items-center gap-2">
+            <span className="w-9 text-right font-mono text-[10px] text-text-muted">{formatTime(currentTime)}</span>
+            <div className="relative h-1.5 flex-1 cursor-pointer overflow-hidden rounded-full bg-black/10" onClick={handleProgressClick}>
+              <div className="absolute left-0 top-0 h-full rounded-full bg-[#171717]" style={{ width: `${progress * 100}%` }} />
             </div>
-            <span className="w-10 font-mono text-[11px] text-text-muted">{formatTime(duration)}</span>
+            <span className="w-9 font-mono text-[10px] text-text-muted">{formatTime(duration)}</span>
           </div>
         </div>
 
-        <div className="flex flex-1 items-center justify-between gap-3 md:justify-end">
-          <button 
-            className={`relative flex h-11 w-11 items-center justify-center rounded-2xl transition-all ${showQueue ? 'bg-accent-cyan/15 text-accent-cyan' : 'bg-white/5 text-text-muted hover:text-text-primary'}`}
-            onClick={() => setShowQueue(!showQueue)}
-            aria-label="Afficher la file"
-          >
-            <ListMusic size={18} />
-            {queue.length > 0 && (
-              <span className="absolute -right-1 -top-1 rounded-full bg-accent-cyan px-1.5 py-0.5 text-[10px] font-black text-bg-primary">
-                {queue.length}
-              </span>
-            )}
+        <div className="flex shrink-0 items-center gap-1 md:gap-2">
+          <button onClick={handlePlayPause} className="flex h-10 w-10 items-center justify-center rounded-full bg-[#171717] text-[#f4efe7] md:hidden" aria-label="Lecture pause mobile">
+            {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}
           </button>
-
-          <div className="hidden items-center gap-3 lg:flex">
-            <Volume2 size={18} className="text-text-muted" />
-            <div 
-              className="relative h-2 w-28 cursor-pointer rounded-full bg-white/10"
-              onClick={handleVolumeClick}
-            >
-              <div 
-                className="absolute left-0 top-0 h-full rounded-full bg-text-primary"
-                style={{ width: `${volume * 100}%` }}
-              />
+          <button onClick={() => toggleFavorite(currentTrack.id)} className={`hidden rounded-full p-2 transition-colors sm:block ${favorites.includes(currentTrack.id) ? 'bg-accent-rose/12 text-accent-rose' : 'text-text-muted hover:bg-black/5 hover:text-accent-rose'}`} aria-label="Ajouter aux favoris">
+            <Heart size={17} fill={favorites.includes(currentTrack.id) ? 'currentColor' : 'none'} />
+          </button>
+          <button className={`relative rounded-full p-2 transition-colors ${showQueue ? 'bg-black text-[#f4efe7]' : 'text-text-muted hover:bg-black/5 hover:text-text-primary'}`} onClick={() => setShowQueue(!showQueue)} aria-label="Afficher la file">
+            <ListMusic size={17} />
+            {queue.length > 0 && <span className="absolute -right-1 -top-1 rounded-full bg-[#9b6b43] px-1.5 py-0.5 text-[10px] font-black text-white">{queue.length}</span>}
+          </button>
+          <div className="hidden items-center gap-2 lg:flex">
+            <Volume2 size={16} className="text-text-muted" />
+            <div className="relative h-1.5 w-20 cursor-pointer rounded-full bg-black/10" onClick={handleVolumeClick}>
+              <div className="absolute left-0 top-0 h-full rounded-full bg-[#171717]" style={{ width: `${volume * 100}%` }} />
             </div>
           </div>
-
-          <button className="hidden h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-text-muted transition-all hover:text-text-primary xl:flex" aria-label="Agrandir">
-            <Maximize2 size={18} />
+          <button className="hidden rounded-full p-2 text-text-muted transition-colors hover:bg-black/5 hover:text-text-primary xl:block" aria-label="Agrandir">
+            <Maximize2 size={17} />
           </button>
         </div>
       </div>
 
       <AnimatePresence>
         {showQueue && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            className="pointer-events-auto absolute bottom-full right-0 mb-4"
-          >
+          <motion.div initial={{ opacity: 0, y: 16, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: 0.98 }} transition={{ duration: 0.18 }} className="pointer-events-auto absolute bottom-full right-0 mb-3">
             <QueuePanel onClose={() => setShowQueue(false)} />
           </motion.div>
         )}
