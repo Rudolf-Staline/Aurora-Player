@@ -1,24 +1,11 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 
-interface ViteServer {
-  middlewares: { use: (path: string, handler: (req: IncomingMessage, res: ServerResponse) => void) => void };
-}
-
-interface IncomingMessage {
-  url?: string;
-}
-
-interface ServerResponse {
-  statusCode: number;
-  setHeader: (header: string, value: string) => void;
-  end: (data?: string) => void;
-}
-
-const rawProxyPlugin = () => ({
+const rawProxyPlugin = (): Plugin => ({
   name: 'raw-proxy',
-  configureServer(server: ViteServer) {
+  configureServer(server: ViteDevServer) {
     server.middlewares.use('/raw-proxy', async (req: IncomingMessage, res: ServerResponse) => {
       const urlStr = new URL(req.url || '', 'http://localhost').searchParams.get('url');
       if (!urlStr) {
@@ -89,5 +76,5 @@ export default defineConfig({
         },
       },
     },
-  },
+  }
 })

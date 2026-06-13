@@ -42,6 +42,19 @@ interface PlayerState {
   setLocalTracks: (tracks: Track[]) => void;
 }
 
+const clamp = (value: number, min: number, max: number): number => {
+  if (!Number.isFinite(value)) return min;
+  return Math.min(max, Math.max(min, value));
+};
+
+const getRandomTrack = (tracks: Track[], currentTrackId?: string): Track | null => {
+  if (tracks.length === 0) return null;
+  if (tracks.length === 1) return tracks[0];
+
+  const candidates = tracks.filter((track) => track.id !== currentTrackId);
+  return candidates[Math.floor(Math.random() * candidates.length)] ?? tracks[0];
+};
+
 export const usePlayerStore = create<PlayerState>((set, get) => ({
   currentTrack: null,
   isPlaying: false,
@@ -57,10 +70,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   playTrack: (track) => set({ currentTrack: track, isPlaying: true, currentTime: 0, progress: 0 }),
   pause: () => set({ isPlaying: false }),
   resume: () => set({ isPlaying: true }),
-  setVolume: (volume) => set({ volume }),
-  setProgress: (progress) => set({ progress }),
-  setCurrentTime: (time) => set({ currentTime: time }),
-  setDuration: (duration) => set({ duration }),
+  setVolume: (volume) => set({ volume: clamp(volume, 0, 1) }),
+  setProgress: (progress) => set({ progress: clamp(progress, 0, 1) }),
+  setCurrentTime: (time) => set({ currentTime: Math.max(0, Number.isFinite(time) ? time : 0) }),
+  setDuration: (duration) => set({ duration: Math.max(0, Number.isFinite(duration) ? duration : 0) }),
   addToQueue: (track) => set((state) => ({ queue: [...state.queue, track] })),
   removeFromQueue: (trackId) => set((state) => ({ queue: state.queue.filter(t => t.id !== trackId) })),
   reorderQueue: (newOrder) => set({ queue: newOrder }),
@@ -68,7 +81,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   setQueue: (tracks) => set({ queue: tracks }),
   setLocalTracks: (tracks) => set({ localTracks: tracks }),
   playNext: () => {
-    const { currentTrack, queue, localTracks, isShuffle, repeatMode, playTrack, removeFromQueue } = get();
+    const { currentTrack, queue, localTracks, isShuffle, repeatMode, playTrack, removeFromQueue, pause } = get();
     
     if (repeatMode === 'one' && currentTrack) {
       playTrack(currentTrack);
@@ -83,22 +96,30 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       return;
     }
 
-    if (!currentTrack || localTracks.length === 0) return;
+    if (!currentTrack || localTracks.length === 0) {
+      pause();
+      return;
+    }
 
     if (isShuffle) {
-      const randomIndex = Math.floor(Math.random() * localTracks.length);
-      playTrack(localTracks[randomIndex]);
+      const randomTrack = getRandomTrack(localTracks, currentTrack.id);
+      if (randomTrack) playTrack(randomTrack);
       return;
     }
 
     const currentIndex = localTracks.findIndex(t => t.id === currentTrack.id);
+    if (currentIndex === -1) {
+      playTrack(localTracks[0]);
+      return;
+    }
+
     let nextIndex = currentIndex + 1;
     
     if (nextIndex >= localTracks.length) {
       if (repeatMode === 'all') {
         nextIndex = 0;
       } else {
-        get().pause();
+        pause();
         return;
       }
     }
@@ -115,12 +136,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
 
     const currentIndex = localTracks.findIndex(t => t.id === currentTrack.id);
-    let prevIndex = currentIndex - 1;
-    
-    if (prevIndex < 0) {
-       prevIndex = localTracks.length - 1;
+    if (currentIndex === -1) {
+      playTrack(localTracks[0]);
+      return;
     }
-    
+
+    const prevIndex = currentIndex === 0 ? localTracks.length - 1 : currentIndex - 1;
     playTrack(localTracks[prevIndex]);
   },
   toggleShuffle: () => set((state) => ({ isShuffle: !state.isShuffle })),
