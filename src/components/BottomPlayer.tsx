@@ -15,6 +15,7 @@ export const BottomPlayer: React.FC = () => {
   const [showQueue, setShowQueue] = useState(false);
 
   const formatTime = (timeInSeconds: number) => {
+    if (!Number.isFinite(timeInSeconds) || timeInSeconds <= 0) return '0:00';
     const mins = Math.floor(timeInSeconds / 60);
     const secs = Math.floor(timeInSeconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -45,137 +46,148 @@ export const BottomPlayer: React.FC = () => {
 
   return (
     <motion.div 
-      initial={animationsEnabled ? { y: '100%' } : false}
-      animate={{ y: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="relative h-24 w-full border-t border-white/10 bg-glass px-6 py-2 shadow-2xl backdrop-blur-xl z-50"
+      initial={animationsEnabled ? { y: 120, opacity: 0 } : false}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 30 }}
+      className="pointer-events-none fixed inset-x-3 bottom-3 z-50 md:left-[20rem] md:right-4"
     >
-      <div className="mx-auto flex h-full max-w-screen-2xl items-center justify-between">
-        
-        {/* Track Info */}
-        <div className="flex w-1/4 items-center gap-4">
-          <div className="h-14 w-14 overflow-hidden rounded-lg shadow-lg shadow-accent-violet/20 bg-white/5 flex items-center justify-center">
+      <div className="pointer-events-auto surface-card-strong aurora-ring mx-auto flex max-w-[1220px] flex-col gap-3 rounded-[2rem] p-3 md:flex-row md:items-center md:gap-5 md:px-4">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-white/10 shadow-lg shadow-black/30 md:h-16 md:w-16">
             {currentTrack?.artworkUrl ? (
               <img src={currentTrack.artworkUrl} alt={currentTrack.album} className="h-full w-full object-cover" />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-white/10" />
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-cyan/25 to-accent-violet/25">
+                <div className="h-7 w-7 rounded-full border border-white/30" />
+              </div>
             )}
+            {isPlaying && <div className="absolute inset-x-3 bottom-2 h-1 rounded-full bg-gradient-to-r from-accent-cyan to-accent-violet" />}
           </div>
-          <div className="overflow-hidden flex-1">
-            <h4 className="font-display font-medium text-text-primary text-sm line-clamp-1">
-              {currentTrack?.title || 'No Track Selected'}
+
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent-cyan">
+              {isPlaying ? 'Lecture en cours' : 'Prêt à jouer'}
+            </p>
+            <h4 className="line-clamp-1 text-sm font-black text-text-primary md:text-base">
+              {currentTrack?.title || 'Aucun titre sélectionné'}
             </h4>
-            <p className="text-xs text-text-muted line-clamp-1">
-              {currentTrack?.artist || 'Unknown Artist'}
+            <p className="line-clamp-1 text-xs text-text-muted">
+              {currentTrack?.artist || 'Choisis un morceau, un podcast ou un fichier Drive'}
             </p>
           </div>
+
           {currentTrack && (
             <button 
               onClick={() => toggleFavorite(currentTrack.id)}
-              className={`transition-colors ml-2 ${favorites.includes(currentTrack.id) ? 'text-accent-rose' : 'text-text-muted hover:text-accent-rose'}`}
+              className={`hidden h-10 w-10 items-center justify-center rounded-2xl transition-all sm:flex ${favorites.includes(currentTrack.id) ? 'bg-accent-rose/15 text-accent-rose' : 'bg-white/5 text-text-muted hover:text-accent-rose'}`}
+              aria-label="Ajouter aux favoris"
             >
               <Heart size={18} fill={favorites.includes(currentTrack.id) ? 'currentColor' : 'none'} />
             </button>
           )}
         </div>
 
-        {/* Player Controls */}
-        <div className="flex w-2/4 flex-col items-center gap-2">
-          <div className="flex items-center gap-6">
+        <div className="flex min-w-0 flex-[1.15] flex-col items-center gap-3">
+          <div className="flex items-center gap-3 md:gap-5">
             <button 
               onClick={toggleShuffle}
-              className={`transition-colors relative ${isShuffle ? 'text-accent-cyan' : 'text-text-muted hover:text-text-primary'}`}
+              className={`relative flex h-10 w-10 items-center justify-center rounded-2xl transition-all ${isShuffle ? 'bg-accent-cyan/15 text-accent-cyan' : 'text-text-muted hover:bg-white/10 hover:text-text-primary'}`}
+              aria-label="Shuffle"
             >
               <Shuffle size={18} />
-              {isShuffle && <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 bg-accent-cyan rounded-full" />}
             </button>
             <button 
               onClick={playPrevious}
-              className="text-text-primary hover:text-accent-cyan transition-colors"
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-text-primary transition-all hover:bg-white/10 hover:text-accent-cyan"
+              aria-label="Titre précédent"
             >
               <SkipBack size={20} fill="currentColor" />
             </button>
             <button 
               onClick={handlePlayPause}
               disabled={!currentTrack}
-              className={`flex h-10 w-10 items-center justify-center rounded-full bg-text-primary text-bg-primary transition-transform ${currentTrack ? 'hover:scale-105' : 'opacity-50 cursor-not-allowed'}`}
+              className={`command-button flex h-14 w-14 items-center justify-center rounded-full text-bg-primary transition-transform ${currentTrack ? 'hover:scale-105 active:scale-95' : 'cursor-not-allowed opacity-45'}`}
+              aria-label="Lecture pause"
             >
               {isPlaying ? (
-                <Pause size={20} fill="currentColor" />
+                <Pause size={23} fill="currentColor" />
               ) : (
-                <Play size={20} fill="currentColor" className="ml-1" />
+                <Play size={23} fill="currentColor" className="ml-1" />
               )}
             </button>
             <button 
               onClick={playNext}
-              className="text-text-primary hover:text-accent-cyan transition-colors"
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-text-primary transition-all hover:bg-white/10 hover:text-accent-cyan"
+              aria-label="Titre suivant"
             >
               <SkipForward size={20} fill="currentColor" />
             </button>
             <button 
               onClick={toggleRepeatMode}
-              className={`transition-colors relative ${repeatMode !== 'none' ? 'text-accent-cyan' : 'text-text-muted hover:text-text-primary'}`}
+              className={`relative flex h-10 w-10 items-center justify-center rounded-2xl transition-all ${repeatMode !== 'none' ? 'bg-accent-cyan/15 text-accent-cyan' : 'text-text-muted hover:bg-white/10 hover:text-text-primary'}`}
+              aria-label="Répétition"
             >
               <Repeat size={18} />
-              {repeatMode === 'one' && <span className="absolute -top-1 -right-1 text-[8px] font-bold bg-bg-secondary rounded-full w-3 h-3 flex items-center justify-center">1</span>}
-              {repeatMode !== 'none' && <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 bg-accent-cyan rounded-full" />}
+              {repeatMode === 'one' && <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent-cyan text-[9px] font-black text-bg-primary">1</span>}
             </button>
           </div>
-          <div className="flex w-full items-center gap-2 max-w-md">
-            <span className="text-xs text-text-muted font-mono w-10 text-right">{formatTime(currentTime)}</span>
+
+          <div className="flex w-full max-w-xl items-center gap-3">
+            <span className="w-10 text-right font-mono text-[11px] text-text-muted">{formatTime(currentTime)}</span>
             <div 
-              className="relative h-1 flex-1 cursor-pointer rounded-full bg-white/10 overflow-hidden"
+              className="relative h-2 flex-1 cursor-pointer overflow-hidden rounded-full bg-white/10"
               onClick={handleProgressClick}
             >
               <div 
-                className="absolute left-0 top-0 h-full bg-gradient-to-r from-accent-cyan to-accent-violet rounded-full glow-cyan"
+                className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-accent-cyan to-accent-violet shadow-[0_0_20px_rgba(125,211,252,0.35)]"
                 style={{ width: `${progress * 100}%` }}
               />
             </div>
-            <span className="text-xs text-text-muted font-mono w-10">{formatTime(duration)}</span>
+            <span className="w-10 font-mono text-[11px] text-text-muted">{formatTime(duration)}</span>
           </div>
         </div>
 
-        {/* Secondary Controls */}
-        <div className="flex w-1/4 items-center justify-end gap-4 relative">
+        <div className="flex flex-1 items-center justify-between gap-3 md:justify-end">
           <button 
-            className={`text-text-muted hover:text-text-primary transition-colors relative ${showQueue ? 'text-accent-cyan' : ''}`}
+            className={`relative flex h-11 w-11 items-center justify-center rounded-2xl transition-all ${showQueue ? 'bg-accent-cyan/15 text-accent-cyan' : 'bg-white/5 text-text-muted hover:text-text-primary'}`}
             onClick={() => setShowQueue(!showQueue)}
+            aria-label="Afficher la file"
           >
             <ListMusic size={18} />
             {queue.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-accent-cyan text-bg-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+              <span className="absolute -right-1 -top-1 rounded-full bg-accent-cyan px-1.5 py-0.5 text-[10px] font-black text-bg-primary">
                 {queue.length}
               </span>
             )}
           </button>
-          <button className="text-text-muted hover:text-text-primary transition-colors">
-            <Volume2 size={18} />
-          </button>
-          <div 
-            className="relative h-1 w-24 cursor-pointer rounded-full bg-white/10"
-            onClick={handleVolumeClick}
-          >
+
+          <div className="hidden items-center gap-3 lg:flex">
+            <Volume2 size={18} className="text-text-muted" />
             <div 
-              className="absolute left-0 top-0 h-full rounded-full bg-text-primary"
-              style={{ width: `${volume * 100}%` }}
-            />
+              className="relative h-2 w-28 cursor-pointer rounded-full bg-white/10"
+              onClick={handleVolumeClick}
+            >
+              <div 
+                className="absolute left-0 top-0 h-full rounded-full bg-text-primary"
+                style={{ width: `${volume * 100}%` }}
+              />
+            </div>
           </div>
-          <button className="text-text-muted hover:text-text-primary transition-colors ml-2">
+
+          <button className="hidden h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-text-muted transition-all hover:text-text-primary xl:flex" aria-label="Agrandir">
             <Maximize2 size={18} />
           </button>
         </div>
-
       </div>
 
       <AnimatePresence>
         {showQueue && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-full right-0 mb-4 mr-6"
+            className="pointer-events-auto absolute bottom-full right-0 mb-4"
           >
             <QueuePanel onClose={() => setShowQueue(false)} />
           </motion.div>
