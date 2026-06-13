@@ -57,7 +57,7 @@ export const BottomPlayer: React.FC = () => {
           </span>
           <div className="pr-1">
             <p className="eyebrow">Player en veille</p>
-            <p className="text-xs">Choisis un titre pour afficher les contrôles.</p>
+            <p className="text-xs">Sélectionne un titre pour commencer.</p>
           </div>
         </div>
       </motion.div>

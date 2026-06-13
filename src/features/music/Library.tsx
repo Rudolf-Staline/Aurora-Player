@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Play, FolderOpen, Loader2, Music, ArrowUpRight, Disc3, Radio, Headphones } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Play, FolderOpen, Loader2, Music, ArrowUpRight, Disc3, Radio, Headphones, Cloud } from 'lucide-react';
 import { usePlayerStore, type Track } from '../../store/usePlayerStore';
 import { toast } from 'react-hot-toast';
 import { scanDirectory, getFileMetadata } from '../../utils/fileScanner';
@@ -23,6 +24,7 @@ const mockAlbums: AlbumData[] = [
 ];
 
 export const Library: React.FC = () => {
+  const navigate = useNavigate();
   const { localTracks, setLocalTracks } = usePlayerStore();
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState('');
@@ -97,12 +99,12 @@ export const Library: React.FC = () => {
         <div className="relative grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-stretch">
           <div className="flex min-h-[520px] flex-col justify-between">
             <div>
-              <p className="eyebrow mb-8">Omed editorial audio</p>
+              <p className="eyebrow mb-8">Omed Player</p>
               <h1 className="max-w-4xl text-[clamp(3rem,7vw,6.4rem)] font-semibold leading-[0.9] tracking-tight text-text-primary">
-                Écouter mieux, sans bruit visuel.
+                Écouter avec intention.
               </h1>
               <p className="mt-8 max-w-xl text-lg leading-8 text-text-muted">
-                Une bibliothèque sobre pour tes fichiers locaux, Drive et sessions audio. Moins d’effets, plus de concentration.
+                Une bibliothèque audio calme, connectée et pensée pour les longues sessions.
               </p>
             </div>
 
@@ -116,10 +118,10 @@ export const Library: React.FC = () => {
                 {isScanning ? 'Scan en cours' : 'Scanner un dossier'}
               </button>
               <button
-                onClick={() => mockAlbums[0] && handlePlayDemo(mockAlbums[0])}
+                onClick={() => navigate('/drive')}
                 className="btn-secondary inline-flex items-center justify-center gap-3 rounded-full px-7 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-text-primary transition-colors"
               >
-                <Play size={17} fill="currentColor" /> Démo
+                <Cloud size={17} /> Ouvrir Drive
               </button>
             </div>
           </div>
