@@ -21,7 +21,7 @@ describe('rssParser helpers', () => {
 describe('parsePodcastXML', () => {
   it('parses RSS episodes and skips entries without audio URLs', () => {
     const xml = `
-      <rss>
+      <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
         <channel>
           <title>Omed Talks</title>
           <image><url>https://example.com/show.png</url></image>
