@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, GripVertical, Trash2 } from 'lucide-react';
+import { X, GripVertical, Trash2, ListMusic, Sparkles } from 'lucide-react';
 import { usePlayerStore } from '../store/usePlayerStore';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
@@ -10,7 +10,7 @@ interface QueuePanelProps {
   onClose: () => void;
 }
 
-const SortableTrackItem = ({ track }: { track: Track }) => {
+const SortableTrackItem = ({ track, index }: { track: Track; index: number }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: track.id });
   const { currentTrack, playTrack, removeFromQueue } = usePlayerStore();
 
@@ -25,18 +25,26 @@ const SortableTrackItem = ({ track }: { track: Track }) => {
     <div 
       ref={setNodeRef} 
       style={style} 
-      className={`flex items-center gap-3 p-3 rounded-xl border ${isPlaying ? 'bg-accent-cyan/10 border-accent-cyan/30' : 'bg-white/5 border-transparent hover:bg-white/10'} group transition-colors`}
+      className={`group flex items-center gap-3 rounded-3xl border p-3 transition-all ${isPlaying ? 'border-accent-cyan/35 bg-accent-cyan/10 text-accent-cyan shadow-lg shadow-accent-cyan/10' : 'border-white/10 bg-white/[0.045] text-text-primary hover:border-white/20 hover:bg-white/[0.075]'}`}
     >
-      <div {...attributes} {...listeners} className="cursor-grab text-text-muted hover:text-text-primary p-1">
+      <div {...attributes} {...listeners} className="cursor-grab touch-none rounded-xl p-1 text-text-muted transition-colors hover:bg-white/10 hover:text-text-primary">
         <GripVertical size={16} />
       </div>
-      <div className="flex-1 min-w-0" onDoubleClick={() => playTrack(track)}>
-        <p className={`text-sm font-medium truncate ${isPlaying ? 'text-accent-cyan' : 'text-text-primary'}`}>{track.title}</p>
-        <p className="text-xs text-text-muted truncate">{track.artist}</p>
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white/[0.06] shadow-lg">
+        {track.artworkUrl ? (
+          <img src={track.artworkUrl} alt={track.title} className="h-full w-full object-cover" />
+        ) : (
+          <span className="font-mono text-xs text-text-muted">{index + 1}</span>
+        )}
+      </div>
+      <div className="min-w-0 flex-1 cursor-pointer" onDoubleClick={() => playTrack(track)}>
+        <p className={`truncate text-sm font-black ${isPlaying ? 'text-accent-cyan' : 'text-text-primary'}`}>{track.title}</p>
+        <p className="truncate text-xs text-text-muted">{track.artist}</p>
       </div>
       <button 
         onClick={() => removeFromQueue(track.id)}
-        className="text-text-muted hover:text-accent-rose opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-full hover:bg-white/5"
+        className="rounded-2xl p-2 text-text-muted opacity-0 transition-all hover:bg-accent-rose/10 hover:text-accent-rose group-hover:opacity-100"
+        aria-label="Retirer de la file"
       >
         <Trash2 size={16} />
       </button>
@@ -64,34 +72,42 @@ export const QueuePanel: React.FC<QueuePanelProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="absolute bottom-24 right-6 w-96 bg-bg-secondary border border-white/10 rounded-2xl shadow-2xl p-4 flex flex-col z-50">
-      <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
-        <h3 className="font-display font-bold text-lg text-text-primary">Up Next</h3>
+    <div className="surface-card-strong aurora-ring flex max-h-[72vh] w-[min(26rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[2rem] p-4 shadow-2xl">
+      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-accent-cyan/20 blur-3xl" />
+      <div className="relative mb-4 flex items-center justify-between border-b border-white/10 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan">
+            <ListMusic size={20} />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-accent-cyan">À venir</p>
+            <h3 className="text-lg font-black text-text-primary">File d’attente</h3>
+          </div>
+        </div>
         <div className="flex items-center gap-2">
           {queue.length > 0 && (
-             <button 
-               onClick={clearQueue}
-               className="text-xs font-medium text-text-muted hover:text-accent-rose px-2 py-1 rounded transition-colors"
-             >
-               Clear
-             </button>
+            <button onClick={clearQueue} className="rounded-2xl px-3 py-2 text-xs font-bold text-text-muted transition-colors hover:bg-accent-rose/10 hover:text-accent-rose">
+              Vider
+            </button>
           )}
-          <button onClick={onClose} className="p-1 text-text-muted hover:text-text-primary transition-colors">
+          <button onClick={onClose} className="rounded-2xl p-2 text-text-muted transition-colors hover:bg-white/10 hover:text-text-primary" aria-label="Fermer">
             <X size={20} />
           </button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-2 max-h-[400px]">
+      <div className="relative flex-1 space-y-2 overflow-y-auto pr-1">
         {queue.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-text-muted">
-            <p className="text-sm">Your queue is empty.</p>
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-black/15 px-6 py-14 text-center text-text-muted">
+            <Sparkles size={34} className="mb-3 text-text-muted/40" />
+            <p className="font-bold text-text-primary">La file est vide</p>
+            <p className="mt-2 text-xs leading-5">Ajoute plusieurs titres depuis une liste pour préparer ta session.</p>
           </div>
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={queue.map(t => t.id)} strategy={verticalListSortingStrategy}>
-              {queue.map((track) => (
-                <SortableTrackItem key={track.id} track={track} />
+              {queue.map((track, index) => (
+                <SortableTrackItem key={track.id} track={track} index={index} />
               ))}
             </SortableContext>
           </DndContext>
