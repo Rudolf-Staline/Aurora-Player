@@ -91,149 +91,156 @@ export const TrackList: React.FC<TrackListProps> = ({ tracks, onPlayContext, loa
 
   return (
     <div className="relative w-full pb-28">
-      <div className="hidden rounded-[1.75rem] border border-white/10 bg-white/[0.035] p-2 md:block">
-        <table className="w-full border-separate border-spacing-y-1 text-left">
-          <thead>
-            <tr className="text-[11px] uppercase tracking-[0.22em] text-text-muted">
-              <th className="w-20 px-3 py-3 font-black">
-                <div className="flex items-center gap-3">
-                  <input 
-                    type="checkbox" 
-                    checked={selectedTracks.length === tracks.length && tracks.length > 0}
-                    onChange={handleSelectAll}
-                    className={`rounded border-white/20 bg-white/10 text-accent-cyan focus:ring-accent-cyan ${selectedTracks.length > 0 ? 'opacity-100' : 'opacity-0'}`}
+      {/* Desktop — elegant rows */}
+      <div className="hidden md:block">
+        <div className="grid grid-cols-[3.5rem_1fr_14rem_5rem_5rem] items-center gap-3 border-b border-premium px-4 pb-3 text-[10px] font-medium uppercase tracking-[0.28em] text-text-muted">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              checked={selectedTracks.length === tracks.length && tracks.length > 0}
+              onChange={handleSelectAll}
+              className={`h-3.5 w-3.5 rounded border-white/20 bg-white/[0.06] text-accent-primary focus:ring-accent-primary focus:ring-offset-0 ${selectedTracks.length > 0 ? 'opacity-100' : 'opacity-0'}`}
+            />
+            <span className={`${selectedTracks.length > 0 ? 'hidden' : 'inline'} -ml-3.5 w-3.5 text-center`}>#</span>
+          </div>
+          <span>Titre</span>
+          <span>Album</span>
+          <span className="text-right">Durée</span>
+          <span />
+        </div>
+
+        <div className="mt-1">
+          {tracks.map((track, index) => {
+            const selected = isSelected(track.id);
+            const isFavorite = favorites.includes(track.id);
+            const loading = loadingTrackId === track.id;
+            return (
+              <div
+                key={track.id}
+                className={`group grid cursor-pointer grid-cols-[3.5rem_1fr_14rem_5rem_5rem] items-center gap-3 rounded-2xl px-4 py-2.5 transition-colors duration-200 ${
+                  selected
+                    ? 'state-active'
+                    : loading
+                      ? 'bg-white/[0.05]'
+                      : 'hover:bg-white/[0.04]'
+                }`}
+                onDoubleClick={() => playTrack(track)}
+                onClick={(e) => {
+                  if (e.ctrlKey || e.metaKey || selectedTracks.length > 0) {
+                    e.preventDefault();
+                    toggleSelection(track);
+                  }
+                }}
+              >
+                {/* Index / play / checkbox */}
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => toggleSelection(track)}
+                    onClick={(e) => e.stopPropagation()}
+                    className={`h-3.5 w-3.5 rounded border-white/20 bg-white/[0.06] text-accent-primary focus:ring-accent-primary focus:ring-offset-0 transition-opacity ${selected || selectedTracks.length > 0 ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                   />
-                  <span className={`${selectedTracks.length > 0 ? 'opacity-0' : 'opacity-100'} transition-opacity`}>#</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); playTrack(track); }}
+                    className={`-ml-3.5 flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-all ${selected || selectedTracks.length > 0 ? 'opacity-0' : 'opacity-100'} group-hover:opacity-100 group-hover:bg-accent-primary group-hover:text-bg-primary`}
+                    aria-label={`Lire ${track.title}`}
+                  >
+                    {loading ? <Loader2 size={15} className="animate-spin" /> : <Play size={14} fill="currentColor" className="ml-0.5" />}
+                  </button>
+                  <span className={`-ml-8 w-8 text-center font-mono text-xs text-text-muted ${selected || selectedTracks.length > 0 ? 'opacity-0' : 'group-hover:opacity-0'}`}>{index + 1}</span>
                 </div>
-              </th>
-              <th className="px-3 py-3 font-black">Titre</th>
-              <th className="px-3 py-3 font-black">Album</th>
-              <th className="px-3 py-3 text-right font-black">Durée</th>
-              <th className="w-20 px-3 py-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {tracks.map((track, index) => {
-              const selected = isSelected(track.id);
-              const isFavorite = favorites.includes(track.id);
-              return (
-                <tr 
-                  key={track.id} 
-                  className={`group cursor-pointer transition-all ${selected ? 'bg-accent-cyan/10 shadow-[inset_0_0_0_1px_rgba(125,211,252,0.35)]' : loadingTrackId === track.id ? 'bg-white/10 opacity-80' : 'hover:bg-white/[0.065]'}`}
-                  onDoubleClick={() => playTrack(track)}
-                  onClick={(e) => {
-                    if (e.ctrlKey || e.metaKey || selectedTracks.length > 0) {
-                      e.preventDefault();
-                      toggleSelection(track);
-                    }
-                  }}
-                >
-                  <td className="rounded-l-2xl px-3 py-3 text-sm text-text-muted">
-                    <div className="flex items-center gap-3">
-                      <input 
-                        type="checkbox" 
-                        checked={selected}
-                        onChange={() => toggleSelection(track)}
-                        onClick={(e) => e.stopPropagation()}
-                        className={`rounded border-white/20 bg-white/10 text-accent-cyan focus:ring-accent-cyan transition-opacity ${selected || selectedTracks.length > 0 ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                      />
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); playTrack(track); }}
-                        className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white/[0.06] text-text-muted transition-all group-hover:bg-accent-cyan group-hover:text-bg-primary"
-                        aria-label={`Lire ${track.title}`}
-                      >
-                        {loadingTrackId === track.id ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
-                      </button>
-                      <span className="w-6 font-mono text-xs">{index + 1}</span>
-                    </div>
-                  </td>
-                  <td className="px-3 py-3">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-white/[0.06] shadow-lg">
-                        {track.artworkUrl ? (
-                          <img src={track.artworkUrl} alt={track.album} className="h-full w-full object-cover" />
+
+                {/* Title + artwork */}
+                <div className="flex min-w-0 items-center gap-4">
+                  <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl border-premium bg-bg-elevated">
+                    {track.artworkUrl ? (
+                      <img src={track.artworkUrl} alt={track.album} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-bg-elevated">
+                        <Play size={14} fill="currentColor" className="text-text-muted/60" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className={`line-clamp-1 text-sm font-medium ${selected ? 'text-accent-primary' : 'text-text-primary'}`}>{track.title}</div>
+                    <div className="line-clamp-1 text-xs text-text-muted">{track.artist}</div>
+                  </div>
+                </div>
+
+                {/* Album */}
+                <div className="text-sm text-text-muted">
+                  <span className="line-clamp-1">{track.album}</span>
+                </div>
+
+                {/* Duration */}
+                <div className="text-right font-mono text-xs text-text-muted">
+                  {formatDuration(track.duration)}
+                </div>
+
+                {/* Actions */}
+                <div className="relative flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleFavorite(track.id); }}
+                    className={`rounded-full p-2 transition-all ${isFavorite ? 'text-danger opacity-100' : 'text-text-muted opacity-0 hover:bg-white/[0.06] hover:text-danger group-hover:opacity-100'}`}
+                    aria-label="Favori"
+                  >
+                    <Heart size={15} fill={isFavorite ? 'currentColor' : 'none'} />
+                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setContextMenuId(contextMenuId === track.id ? null : track.id); }}
+                      className={`rounded-full p-2 text-text-muted transition-all hover:bg-white/[0.06] hover:text-text-primary ${contextMenuId === track.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                      aria-label="Plus d'options"
+                    >
+                      <MoreHorizontal size={15} />
+                    </button>
+                    {contextMenuId === track.id && (
+                      <div className="surface-card-strong shadow-deep absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl p-1 text-left text-sm">
+                        <div className="px-3 py-2 text-[10px] font-medium uppercase tracking-[0.24em] text-accent-primary">Ajouter à une playlist</div>
+                        {playlists.length === 0 ? (
+                          <div className="px-3 py-3 text-xs italic text-text-muted">Aucune playlist créée</div>
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-cyan/20 to-accent-violet/20">
-                            <Play size={15} fill="currentColor" className="text-text-muted" />
-                          </div>
+                          playlists.map(p => (
+                            <button
+                              key={p.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addTrackToPlaylist(p.id, track);
+                                setContextMenuId(null);
+                              }}
+                              className="flex w-full items-center gap-2 truncate rounded-xl px-3 py-2 text-left text-text-primary transition-colors hover:bg-white/[0.06]"
+                              title={p.name}
+                            >
+                              <Plus size={14} className="shrink-0 text-text-muted" /> {p.name}
+                            </button>
+                          ))
                         )}
                       </div>
-                      <div className="min-w-0">
-                        <div className="line-clamp-1 text-sm font-black text-text-primary">{track.title}</div>
-                        <div className="line-clamp-1 text-xs text-text-muted">{track.artist}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-3 py-3 text-sm text-text-muted">
-                    <span className="line-clamp-1">{track.album}</span>
-                  </td>
-                  <td className="px-3 py-3 text-right font-mono text-sm text-text-muted">
-                    {formatDuration(track.duration)}
-                  </td>
-                  <td className="relative rounded-r-2xl px-3 py-3 text-right" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex items-center justify-end gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); toggleFavorite(track.id); }}
-                        className={`rounded-xl p-2 transition-colors ${isFavorite ? 'bg-accent-rose/15 text-accent-rose' : 'text-text-muted hover:bg-white/10 hover:text-accent-rose'}`}
-                        aria-label="Favori"
-                      >
-                        <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
-                      </button>
-                      <div className="relative">
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setContextMenuId(contextMenuId === track.id ? null : track.id); }}
-                          className="rounded-xl p-2 text-text-muted transition-colors hover:bg-white/10 hover:text-text-primary"
-                          aria-label="Plus d'options"
-                        >
-                          <MoreHorizontal size={16} />
-                        </button>
-                        {contextMenuId === track.id && (
-                          <div className="surface-card absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl p-1 text-left text-sm shadow-2xl">
-                            <div className="rounded-xl bg-white/[0.05] px-3 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-text-muted">Ajouter à une playlist</div>
-                            {playlists.length === 0 ? (
-                              <div className="px-3 py-3 text-xs italic text-text-muted">Aucune playlist créée</div>
-                            ) : (
-                              playlists.map(p => (
-                                <button 
-                                  key={p.id}
-                                  onClick={(e) => { 
-                                    e.stopPropagation(); 
-                                    addTrackToPlaylist(p.id, track); 
-                                    setContextMenuId(null);
-                                  }}
-                                  className="flex w-full items-center gap-2 truncate rounded-xl px-3 py-2 text-left text-text-primary transition-colors hover:bg-white/10"
-                                  title={p.name}
-                                >
-                                  <Plus size={14} className="shrink-0" /> {p.name}
-                                </button>
-                              ))
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="space-y-3 md:hidden">
+      {/* Mobile */}
+      <div className="space-y-2 md:hidden">
         {tracks.map((track) => {
           const selected = isSelected(track.id);
           const isFavorite = favorites.includes(track.id);
           return (
-            <article key={track.id} className={`surface-card flex items-center gap-3 rounded-3xl p-3 ${selected ? 'ring-1 ring-accent-cyan/50' : ''}`}>
-              <button onClick={() => playTrack(track)} className="command-button flex h-11 w-11 shrink-0 items-center justify-center rounded-full">
+            <article key={track.id} className={`surface-card flex items-center gap-3 rounded-2xl p-3 ${selected ? 'state-active' : ''}`}>
+              <button onClick={() => playTrack(track)} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent-primary text-bg-primary">
                 <Play size={16} fill="currentColor" className="ml-0.5" />
               </button>
               <div className="min-w-0 flex-1">
-                <p className="line-clamp-1 text-sm font-black text-text-primary">{track.title}</p>
+                <p className="line-clamp-1 text-sm font-medium text-text-primary">{track.title}</p>
                 <p className="line-clamp-1 text-xs text-text-muted">{track.artist}</p>
               </div>
-              <button onClick={() => toggleFavorite(track.id)} className={`rounded-2xl p-2 ${isFavorite ? 'text-accent-rose' : 'text-text-muted'}`}>
+              <button onClick={() => toggleFavorite(track.id)} className={`rounded-full p-2 ${isFavorite ? 'text-danger' : 'text-text-muted'}`}>
                 <Heart size={18} fill={isFavorite ? 'currentColor' : 'none'} />
               </button>
             </article>
@@ -242,30 +249,30 @@ export const TrackList: React.FC<TrackListProps> = ({ tracks, onPlayContext, loa
       </div>
 
       {selectedTracks.length > 0 && (
-        <div className="surface-card-strong fixed left-1/2 z-[999] flex -translate-x-1/2 items-center gap-3 rounded-[1.75rem] px-4 py-3 shadow-2xl" style={{ bottom: '112px' }}>
-          <span className="min-w-24 text-sm font-black text-text-primary">{selectedTracks.length} sélectionné{selectedTracks.length > 1 ? 's' : ''}</span>
-          <button onClick={() => setShowPlaylistModal(true)} className="command-button flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-black">
+        <div className="surface-card-strong shadow-deep fixed left-1/2 z-[999] flex -translate-x-1/2 items-center gap-3 rounded-full px-4 py-3" style={{ bottom: '112px' }}>
+          <span className="min-w-24 px-1 text-sm font-medium text-text-primary">{selectedTracks.length} sélectionné{selectedTracks.length > 1 ? 's' : ''}</span>
+          <button onClick={() => setShowPlaylistModal(true)} className="btn-primary flex items-center gap-2 rounded-full px-4 py-2 text-sm">
             <Plus size={16} /> Playlist
           </button>
-          <button onClick={handleAddToQueue} className="flex items-center gap-2 rounded-2xl bg-white/10 px-4 py-2 text-sm font-bold text-text-primary transition-colors hover:bg-white/20">
+          <button onClick={handleAddToQueue} className="btn-secondary flex items-center gap-2 rounded-full px-4 py-2 text-sm">
             <ListPlus size={16} /> File
           </button>
-          <button onClick={() => setSelectedTracks([])} className="rounded-2xl p-2 text-text-muted transition-colors hover:bg-white/10 hover:text-text-primary">
+          <button onClick={() => setSelectedTracks([])} className="rounded-full p-2 text-text-muted transition-colors hover:bg-white/[0.06] hover:text-text-primary">
             <X size={18} />
           </button>
         </div>
       )}
 
       {showPlaylistModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-md" onClick={() => setShowPlaylistModal(false)}>
-          <div className="surface-card-strong w-full max-w-md rounded-[2rem] p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" onClick={() => setShowPlaylistModal(false)}>
+          <div className="surface-card-strong shadow-deep w-full max-w-md rounded-[2rem] p-6" onClick={e => e.stopPropagation()}>
             <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-xl font-black text-text-primary">Ajouter à une playlist</h3>
-              <button onClick={() => setShowPlaylistModal(false)} className="rounded-xl p-2 text-text-muted hover:bg-white/10 hover:text-text-primary">
+              <h3 className="text-xl font-semibold text-text-primary">Ajouter à une playlist</h3>
+              <button onClick={() => setShowPlaylistModal(false)} className="rounded-full p-2 text-text-muted hover:bg-white/[0.06] hover:text-text-primary">
                 <X size={20} />
               </button>
             </div>
-            <button onClick={handleCreateAndAdd} className="mb-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-accent-cyan/50 p-3 text-sm font-black text-accent-cyan transition-colors hover:bg-accent-cyan/10">
+            <button onClick={handleCreateAndAdd} className="mb-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-premium-strong p-3 text-sm font-medium text-accent-primary transition-colors hover:bg-white/[0.04]">
               <Plus size={18} /> Nouvelle playlist
             </button>
             <div className="max-h-[400px] space-y-2 overflow-y-auto pr-2">
@@ -273,8 +280,8 @@ export const TrackList: React.FC<TrackListProps> = ({ tracks, onPlayContext, loa
                 <p className="py-4 text-center text-sm text-text-muted">Aucune playlist disponible.</p>
               ) : (
                 playlists.map(p => (
-                  <button key={p.id} onClick={() => handleAddToPlaylistBulk(p.id)} className="flex w-full items-center justify-between rounded-2xl bg-white/[0.06] p-3 transition-colors hover:bg-white/10">
-                    <span className="truncate font-bold text-text-primary">{p.name}</span>
+                  <button key={p.id} onClick={() => handleAddToPlaylistBulk(p.id)} className="flex w-full items-center justify-between rounded-2xl border border-premium bg-white/[0.02] p-3 transition-colors hover:bg-white/[0.05]">
+                    <span className="truncate font-medium text-text-primary">{p.name}</span>
                     <span className="text-xs text-text-muted">{p.tracks.length} titres</span>
                   </button>
                 ))

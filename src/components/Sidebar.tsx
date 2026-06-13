@@ -55,27 +55,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         />
       )}
       
-      <aside className={`surface-card relative z-40 flex h-full w-[18rem] shrink-0 flex-col overflow-hidden rounded-[2rem] p-4 transition-transform duration-300 md:translate-x-0 md:flex ${isOpen ? 'absolute inset-y-0 left-0 translate-x-0' : 'absolute inset-y-0 left-0 hidden -translate-x-full md:static md:flex'}`}>
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-accent-cyan/12 to-transparent" />
-
+      <aside className={`surface-card relative z-40 flex h-full w-[18rem] shrink-0 flex-col overflow-hidden rounded-[1.75rem] p-4 transition-transform duration-300 md:translate-x-0 md:flex ${isOpen ? 'absolute inset-y-0 left-0 translate-x-0' : 'absolute inset-y-0 left-0 hidden -translate-x-full md:static md:flex'}`}>
         <div className="relative mb-6 flex items-center gap-3 px-1 pt-1">
-          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent-cyan to-accent-violet shadow-lg glow-cyan">
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-accent-primary/25 bg-bg-secondary">
             <img src="/app-logo.png" alt="Omed Logo" className="h-full w-full object-cover" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-accent-cyan">Studio</p>
-            <h1 className="truncate text-xl font-black tracking-tight text-text-primary">Omed Player</h1>
+            <p className="eyebrow">Premium Audio</p>
+            <h1 className="truncate text-xl font-semibold tracking-tight text-text-primary">Omed Player</h1>
           </div>
         </div>
 
-        <div className="surface-card-strong aurora-ring mb-5 rounded-3xl p-4">
+        <div className="surface-card-strong mb-5 rounded-2xl p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-accent-cyan">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent-primary/10 text-accent-primary">
               <Radio size={19} />
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-text-muted">Mode</p>
-              <p className="text-sm font-bold text-text-primary">Audio concentré</p>
+              <p className="text-sm font-semibold text-text-primary">Audio concentré</p>
             </div>
           </div>
         </div>
@@ -94,16 +92,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   <NavLink 
                     to={item.path}
                     className={({ isActive }) => 
-                      `group flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold transition-all ${
-                        isActive 
-                          ? 'bg-white/[0.12] text-text-primary shadow-lg shadow-black/20 ring-1 ring-white/10' 
-                          : 'text-text-muted hover:bg-white/[0.07] hover:text-text-primary'
+                      `group flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition-all ${
+                        isActive
+                          ? 'bg-bg-elevated text-text-primary border border-accent-primary/25'
+                          : 'text-text-muted hover:bg-white/[0.05] hover:text-text-primary'
                       }`
                     }
                   >
                     {({ isActive }) => (
                       <>
-                        <span className={`flex h-10 w-10 items-center justify-center rounded-2xl transition-all ${isActive ? 'bg-gradient-to-br from-accent-cyan to-accent-violet text-bg-primary glow-cyan' : 'bg-white/5 text-text-muted group-hover:text-accent-cyan'}`}>
+                        <span className={`flex h-10 w-10 items-center justify-center rounded-2xl transition-all ${isActive ? 'bg-accent-primary text-[#161310]' : 'bg-white/5 text-text-muted group-hover:text-accent-primary'}`}>
                           {item.icon}
                         </span>
                         <span className="min-w-0 flex-1">
@@ -132,9 +130,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     to={item.path}
                     className={({ isActive }) => 
                       `flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-all ${
-                        isActive 
-                          ? 'bg-white/[0.12] text-accent-cyan ring-1 ring-white/10' 
-                          : 'text-text-muted hover:bg-white/[0.07] hover:text-text-primary'
+                        isActive
+                          ? 'bg-bg-elevated text-accent-primary border border-accent-primary/25'
+                          : 'text-text-muted hover:bg-white/[0.05] hover:text-text-primary'
                       }`
                     }
                   >

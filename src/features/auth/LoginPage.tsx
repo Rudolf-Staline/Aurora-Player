@@ -29,32 +29,27 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="fixed inset-0 flex items-center justify-center overflow-hidden bg-bg-primary p-4 text-text-primary">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[-12rem] top-[-14rem] h-[36rem] w-[36rem] rounded-full bg-accent-cyan/20 blur-[130px]" />
-        <div className="absolute bottom-[-16rem] right-[-10rem] h-[42rem] w-[42rem] rounded-full bg-accent-violet/20 blur-[140px]" />
-        <div className="soft-grid absolute inset-0 opacity-70" />
+        <div className="absolute left-1/2 top-[-18rem] h-[40rem] w-[52rem] -translate-x-1/2 rounded-full bg-accent-primary/[0.06] blur-[140px]" />
       </div>
 
-      <div className="relative z-10 grid w-full max-w-6xl overflow-hidden rounded-[2.25rem] border border-white/10 bg-black/20 shadow-2xl shadow-black/50 backdrop-blur-md lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="relative z-10 grid w-full max-w-6xl overflow-hidden rounded-[2rem] border-premium-strong surface-secondary shadow-deep lg:grid-cols-[1.05fr_0.95fr]">
         <section className="surface-card-strong relative min-h-[560px] overflow-hidden p-8 md:p-12">
-          <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-accent-cyan/20 blur-3xl" />
-          <div className="absolute -bottom-24 left-10 h-80 w-80 rounded-full bg-accent-violet/20 blur-3xl" />
-
           <div className="relative flex h-full flex-col justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-accent-cyan to-accent-violet glow-cyan">
+              <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-accent-primary/25 bg-bg-secondary">
                 <img src="/app-logo.png" alt="Omed Logo" className="h-full w-full object-cover" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-accent-cyan">Omed</p>
-                <p className="text-xl font-black text-text-primary">Player Studio</p>
+                <p className="eyebrow">Omed</p>
+                <p className="text-xl font-semibold text-text-primary">Player Studio</p>
               </div>
             </div>
 
             <div className="max-w-xl">
-              <p className="mb-4 inline-flex rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">
+              <p className="mb-4 inline-flex rounded-full border-premium bg-bg-elevated px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-accent-primary">
                 Music · Podcasts · Drive
               </p>
-              <h1 className="text-5xl font-black leading-none tracking-tight text-text-primary md:text-7xl">
+              <h1 className="text-5xl font-semibold leading-[1.02] tracking-[-0.03em] text-text-primary md:text-7xl">
                 Ton espace audio, <span className="text-gradient-aurora">propre et synchronisé</span>.
               </h1>
               <p className="mt-6 text-base leading-7 text-text-muted md:text-lg">
@@ -68,9 +63,9 @@ export const LoginPage: React.FC = () => {
                 { icon: <Headphones size={18} />, label: 'Player premium' },
                 { icon: <ShieldCheck size={18} />, label: 'Données privées' },
               ].map((item) => (
-                <div key={item.label} className="rounded-2xl bg-black/20 p-4 ring-1 ring-white/10">
-                  <div className="mb-3 text-accent-cyan">{item.icon}</div>
-                  <p className="text-sm font-bold text-text-primary">{item.label}</p>
+                <div key={item.label} className="rounded-2xl border-premium bg-bg-secondary p-4">
+                  <div className="mb-3 text-accent-primary">{item.icon}</div>
+                  <p className="text-sm font-semibold text-text-primary">{item.label}</p>
                 </div>
               ))}
             </div>
@@ -80,17 +75,17 @@ export const LoginPage: React.FC = () => {
         <section className="flex items-center justify-center p-6 md:p-10">
           <div className="w-full max-w-md">
             <div className="mb-8">
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-accent-cyan">Connexion</p>
-              <h2 className="mt-2 text-3xl font-black text-text-primary">Entrer dans Omed</h2>
+              <p className="eyebrow">Connexion</p>
+              <h2 className="mt-2 text-3xl font-semibold text-text-primary">Entrer dans Omed</h2>
               <p className="mt-3 text-sm leading-6 text-text-muted">
                 Une seule connexion suffit pour activer la synchronisation et accéder aux fichiers Google Drive.
               </p>
             </div>
 
-            <button 
+            <button
               onClick={() => googleLogin()}
               disabled={loading}
-              className="command-button flex w-full items-center justify-center gap-3 rounded-2xl px-6 py-4 text-sm font-black transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+              className="command-button flex w-full items-center justify-center gap-3 rounded-2xl px-6 py-4 text-sm font-semibold transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             >
               {loading ? (
                 <Loader2 size={24} className="animate-spin" />

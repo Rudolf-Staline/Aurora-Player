@@ -72,16 +72,15 @@ export const QueuePanel: React.FC<QueuePanelProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="surface-card-strong aurora-ring flex max-h-[72vh] w-[min(26rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[2rem] p-4 shadow-2xl">
-      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-accent-cyan/20 blur-3xl" />
-      <div className="relative mb-4 flex items-center justify-between border-b border-white/10 pb-4">
+    <div className="surface-card-strong flex max-h-[72vh] w-[min(26rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.75rem] p-4">
+      <div className="relative mb-4 flex items-center justify-between border-b border-line pb-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-cyan/10 text-accent-cyan">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-primary/10 text-accent-primary">
             <ListMusic size={20} />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-accent-cyan">À venir</p>
-            <h3 className="text-lg font-black text-text-primary">File d’attente</h3>
+            <p className="eyebrow">À venir</p>
+            <h3 className="text-lg font-semibold text-text-primary">File d’attente</h3>
           </div>
         </div>
         <div className="flex items-center gap-2">

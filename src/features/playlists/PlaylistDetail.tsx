@@ -35,35 +35,35 @@ const SortableTrack: React.FC<SortableTrackProps> = ({ track, index, onRemove, o
   };
 
   return (
-    <div 
-      ref={setNodeRef} 
-      style={style} 
-      className={`group flex items-center gap-3 rounded-3xl border p-3 transition-all ${isActive ? 'border-accent-cyan/35 bg-accent-cyan/10 text-accent-cyan' : 'border-white/10 bg-white/[0.04] text-text-primary hover:border-white/20 hover:bg-white/[0.075]'}`}
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group flex items-center gap-3 rounded-xl border p-3 transition-all ${isActive ? 'state-active border-premium-strong text-text-primary' : 'border-transparent text-text-primary hover:border-premium hover:bg-white/[0.04]'}`}
     >
-      <div {...attributes} {...listeners} className="cursor-grab touch-none rounded-xl p-2 text-text-muted transition-colors hover:bg-white/10 hover:text-accent-cyan">
+      <div {...attributes} {...listeners} className="cursor-grab touch-none rounded-lg p-2 text-text-muted/70 transition-colors hover:bg-white/[0.06] hover:text-accent-primary">
         <GripVertical size={16} />
       </div>
-      <span className="hidden w-8 text-right font-mono text-xs text-text-muted sm:block">{index + 1}</span>
-      <button className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-white/[0.06] shadow-lg" onClick={onPlay} aria-label={`Lire ${track.title}`}>
+      <span className={`hidden w-8 text-right font-mono text-xs sm:block ${isActive ? 'text-accent-primary' : 'text-text-muted'}`}>{index + 1}</span>
+      <button className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border-premium bg-bg-elevated shadow-deep" onClick={onPlay} aria-label={`Lire ${track.title}`}>
         {track.artworkUrl ? (
           <img src={track.artworkUrl} alt={track.title} className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-cyan/20 to-accent-violet/20 text-text-muted">
+          <div className="flex h-full w-full items-center justify-center bg-bg-elevated text-text-muted">
             <Music size={17} />
           </div>
         )}
-        <div className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition-opacity group-hover:opacity-100">
-          <Play size={17} fill="currentColor" className="ml-0.5 text-white" />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+          <Play size={17} fill="currentColor" className="ml-0.5 text-text-primary" />
         </div>
       </button>
       <div className="min-w-0 flex-1">
-        <div className={`truncate text-sm font-black ${isActive ? 'text-accent-cyan' : 'text-text-primary'}`}>{track.title}</div>
+        <div className={`truncate text-sm font-semibold ${isActive ? 'text-accent-primary' : 'text-text-primary'}`}>{track.title}</div>
         <div className="truncate text-xs text-text-muted">{track.artist}</div>
       </div>
       <div className="hidden w-48 truncate px-4 text-sm text-text-muted md:block">{track.album}</div>
       <div className="flex items-center justify-end gap-3 font-mono text-sm text-text-muted">
         <span>{formatDuration(track.duration)}</span>
-        <button onClick={() => onRemove(track.id)} className="rounded-xl p-2 opacity-0 transition-all hover:bg-accent-rose/10 hover:text-accent-rose group-hover:opacity-100" aria-label="Retirer">
+        <button onClick={() => onRemove(track.id)} className="rounded-lg p-2 opacity-0 transition-all hover:bg-danger/10 hover:text-danger group-hover:opacity-100" aria-label="Retirer">
           <Trash2 size={16} />
         </button>
       </div>
@@ -85,10 +85,14 @@ export const PlaylistDetail: React.FC = () => {
 
   if (!playlist) {
     return (
-      <div className="surface-card flex min-h-[50vh] flex-col items-center justify-center rounded-[2rem] p-8 text-center">
-        <ListMusic size={44} className="mb-4 text-text-muted" />
-        <p className="text-lg font-bold text-text-primary">Playlist introuvable.</p>
-        <button onClick={() => navigate('/playlists')} className="mt-4 rounded-2xl bg-white/[0.08] px-5 py-3 text-sm font-bold text-accent-cyan hover:bg-white/[0.12]">Retour aux playlists</button>
+      <div className="surface-card flex min-h-[50vh] flex-col items-center justify-center rounded-[2rem] p-10 text-center">
+        <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full border-premium bg-bg-elevated text-text-muted">
+          <ListMusic size={36} />
+        </div>
+        <p className="text-2xl font-semibold tracking-tight text-text-primary">Playlist introuvable.</p>
+        <button onClick={() => navigate('/playlists')} className="btn-secondary mt-6 inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold">
+          <ArrowLeft size={16} /> Retour aux playlists
+        </button>
       </div>
     );
   }
@@ -117,52 +121,59 @@ export const PlaylistDetail: React.FC = () => {
 
   const totalDuration = playlist.tracks.reduce((acc, t) => acc + (t.duration || 0), 0);
   const heroArtwork = playlist.coverUrl || playlist.tracks.find(track => track.artworkUrl)?.artworkUrl;
+  const totalMinutes = Math.floor(totalDuration / 60);
+  const durationLabel = totalMinutes >= 60
+    ? `${Math.floor(totalMinutes / 60)} h ${totalMinutes % 60} min`
+    : `${totalMinutes} min`;
 
   return (
-    <div className="space-y-8 pb-10">
-      <button onClick={() => navigate('/playlists')} className="surface-card inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-text-muted transition-colors hover:text-text-primary">
+    <div className="space-y-8 pb-12">
+      <button onClick={() => navigate('/playlists')} className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-text-muted transition-colors hover:text-text-primary">
         <ArrowLeft size={18} /> Retour aux playlists
       </button>
 
-      <section className="surface-card-strong aurora-ring relative overflow-hidden rounded-[2rem] p-6 md:p-8">
-        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent-violet/20 blur-3xl" />
-        <div className="absolute -bottom-28 left-16 h-72 w-72 rounded-full bg-accent-cyan/15 blur-3xl" />
-        <div className="relative grid gap-8 md:grid-cols-[220px_1fr] md:items-end">
-          <div className="aspect-square w-full max-w-[220px] overflow-hidden rounded-[2rem] bg-white/[0.06] shadow-2xl glow-cyan">
+      <section className="surface-card-strong relative overflow-hidden rounded-[2rem] p-8 shadow-deep md:p-12">
+        <div className="relative grid gap-8 md:grid-cols-[280px_1fr] md:items-end md:gap-12">
+          <div className="aspect-square w-full max-w-[280px] overflow-hidden rounded-[1.5rem] border-premium bg-bg-elevated shadow-deep">
             {heroArtwork ? (
               <img src={heroArtwork} alt={playlist.name} className="h-full w-full object-cover" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-cyan/15 to-accent-violet/15 text-text-muted">
-                <Music size={56} />
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-secondary text-text-muted/40">
+                <Music size={58} strokeWidth={1.25} />
               </div>
             )}
           </div>
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">
-              <ListMusic size={14} /> Playlist
+            <span className="eyebrow text-accent-primary">
+              <ListMusic size={13} /> Playlist
+            </span>
+            <h1 className="mt-4 max-w-4xl text-5xl font-semibold leading-[1.05] tracking-tight text-text-primary md:text-7xl">{playlist.name}</h1>
+            <div className="mt-6 flex items-center gap-4 text-sm text-text-muted">
+              <span className="text-text-primary">{playlist.tracks.length} titre{playlist.tracks.length > 1 ? 's' : ''}</span>
+              <span className="h-1 w-1 rounded-full bg-text-muted/40" />
+              <span className="font-mono">{durationLabel}</span>
             </div>
-            <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-text-primary md:text-6xl">{playlist.name}</h1>
-            <p className="mt-4 flex items-center gap-2 font-mono text-sm text-text-muted">
-              {playlist.tracks.length} titre{playlist.tracks.length > 1 ? 's' : ''} • {Math.floor(totalDuration / 60)} min
-            </p>
-            <button onClick={handlePlayAll} disabled={playlist.tracks.length === 0} className="command-button mt-6 inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-black transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50">
-              <Play size={20} fill="currentColor" /> Tout lire
+            <button onClick={handlePlayAll} disabled={playlist.tracks.length === 0} className="btn-primary mt-8 inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50">
+              <Play size={19} fill="currentColor" /> Tout lire
             </button>
           </div>
         </div>
       </section>
 
       {playlist.tracks.length === 0 ? (
-        <section className="surface-card flex min-h-[320px] flex-col items-center justify-center rounded-[2rem] p-8 text-center text-text-muted">
-          <Music size={46} className="mb-4 opacity-30" />
-          <h2 className="text-2xl font-black text-text-primary">Playlist vide</h2>
-          <p className="mt-3 max-w-md text-sm leading-6">Ajoute des titres depuis la bibliothèque, Drive ou une liste de morceaux.</p>
+        <section className="surface-card flex min-h-[340px] flex-col items-center justify-center rounded-[2rem] p-10 text-center">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border-premium bg-bg-elevated text-text-muted">
+            <Music size={34} />
+          </div>
+          <h2 className="text-3xl font-semibold tracking-tight text-text-primary">Playlist vide</h2>
+          <p className="mt-4 max-w-md text-sm leading-7 text-text-muted">Ajoutez des titres depuis la bibliothèque, Drive ou une liste de morceaux.</p>
         </section>
       ) : (
         <section className="surface-card rounded-[2rem] p-4 md:p-6">
-          <div className="mb-4 flex items-center gap-4 border-b border-white/10 pb-4 text-[11px] font-black uppercase tracking-[0.22em] text-text-muted">
-            <div className="w-8" />
+          <div className="mb-3 flex items-center gap-3 border-b border-white/10 px-3 pb-4 text-[11px] uppercase tracking-[0.22em] text-text-muted">
+            <div className="w-9" />
             <div className="hidden w-8 text-right sm:block">#</div>
+            <div className="w-12" />
             <div className="flex-1">Titre</div>
             <div className="hidden w-48 px-4 md:block">Album</div>
             <div className="flex w-16 justify-end"><Clock size={14} /></div>
