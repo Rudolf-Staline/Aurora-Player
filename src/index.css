@@ -9,111 +9,103 @@
   --color-text-primary: var(--text-primary);
   --color-text-muted: var(--text-muted);
 
-  --font-display: 'Clash Display', 'Syne', sans-serif;
-  --font-body: 'DM Sans', 'Outfit', sans-serif;
+  --font-display: 'Clash Display', 'Syne', 'Inter', sans-serif;
+  --font-body: 'DM Sans', 'Outfit', 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
 @layer base {
   :root {
-    --bg-primary: #050712;
-    --bg-secondary: #0c1020;
-    --bg-elevated: rgba(18, 24, 45, 0.78);
-    --bg-glass: rgba(255,255,255,0.055);
-    --accent-cyan: #7dd3fc;
-    --accent-violet: #c084fc;
-    --accent-rose: #fb7185;
-    --text-primary: #f8fbff;
-    --text-muted: #94a3b8;
-    --border: rgba(255,255,255,0.10);
-    --border-strong: rgba(255,255,255,0.18);
-    --glow-cyan: 0 18px 65px rgba(125, 211, 252, 0.24);
-    --glow-violet: 0 18px 65px rgba(192, 132, 252, 0.20);
-  }
-
-  [data-theme="sunset"] {
-    --bg-primary: #12070b;
-    --bg-secondary: #211018;
-    --bg-elevated: rgba(44, 20, 30, 0.78);
-    --accent-cyan: #fb923c;
-    --accent-violet: #f472b6;
-    --accent-rose: #fb7185;
-    --text-primary: #fff7ed;
-    --glow-cyan: 0 18px 65px rgba(251,146,60,0.24);
-    --glow-violet: 0 18px 65px rgba(244,114,182,0.20);
-  }
-
-  [data-theme="forest"] {
-    --bg-primary: #03120d;
-    --bg-secondary: #092018;
-    --bg-elevated: rgba(10, 45, 33, 0.78);
-    --accent-cyan: #34d399;
-    --accent-violet: #facc15;
-    --accent-rose: #86efac;
-    --text-primary: #f0fdf4;
-    --glow-cyan: 0 18px 65px rgba(52,211,153,0.24);
-    --glow-violet: 0 18px 65px rgba(250,204,21,0.18);
-  }
-
-  [data-theme="ocean"] {
-    --bg-primary: #04111f;
-    --bg-secondary: #082033;
-    --bg-elevated: rgba(11, 39, 64, 0.78);
-    --accent-cyan: #38bdf8;
-    --accent-violet: #60a5fa;
-    --accent-rose: #2dd4bf;
-    --text-primary: #f0f9ff;
-    --glow-cyan: 0 18px 65px rgba(56,189,248,0.24);
-    --glow-violet: 0 18px 65px rgba(96,165,250,0.20);
-  }
-
-  [data-theme="neon"] {
-    --bg-primary: #08070a;
-    --bg-secondary: #16131d;
-    --bg-elevated: rgba(29, 24, 40, 0.80);
-    --accent-cyan: #fde047;
-    --accent-violet: #f472b6;
-    --accent-rose: #d946ef;
-    --text-primary: #fafafa;
-    --glow-cyan: 0 18px 65px rgba(253,224,71,0.22);
-    --glow-violet: 0 18px 65px rgba(244,114,182,0.20);
+    --bg-primary: #f4efe7;
+    --bg-secondary: #e8dfd3;
+    --bg-elevated: rgba(255, 252, 246, 0.86);
+    --bg-glass: rgba(255, 252, 246, 0.72);
+    --accent-cyan: #171717;
+    --accent-violet: #9b6b43;
+    --accent-rose: #8a3f3f;
+    --text-primary: #171717;
+    --text-muted: #756c61;
+    --border: rgba(23,23,23,0.12);
+    --border-strong: rgba(23,23,23,0.22);
+    --glow-cyan: 0 18px 44px rgba(23,23,23,0.10);
+    --glow-violet: 0 18px 44px rgba(155,107,67,0.10);
   }
 
   [data-theme="midnight"] {
-    --bg-primary: #020617;
-    --bg-secondary: #0f172a;
-    --bg-elevated: rgba(15, 23, 42, 0.82);
-    --accent-cyan: #818cf8;
-    --accent-violet: #2dd4bf;
-    --accent-rose: #a78bfa;
-    --text-primary: #f8fafc;
-    --glow-cyan: 0 18px 65px rgba(129,140,248,0.24);
-    --glow-violet: 0 18px 65px rgba(45,212,191,0.18);
+    --bg-primary: #111111;
+    --bg-secondary: #1a1a1a;
+    --bg-elevated: rgba(26,26,26,0.88);
+    --bg-glass: rgba(26,26,26,0.72);
+    --accent-cyan: #f4efe7;
+    --accent-violet: #b89b72;
+    --accent-rose: #d18a8a;
+    --text-primary: #f4efe7;
+    --text-muted: #b9afa2;
+    --border: rgba(244,239,231,0.14);
+    --border-strong: rgba(244,239,231,0.24);
   }
 
-  [data-theme="peach"] {
-    --bg-primary: #17080d;
-    --bg-secondary: #2a1118;
-    --bg-elevated: rgba(46, 18, 27, 0.78);
-    --accent-cyan: #fb7185;
-    --accent-violet: #fdba74;
-    --accent-rose: #f43f5e;
-    --text-primary: #fff1f2;
-    --glow-cyan: 0 18px 65px rgba(251,113,133,0.24);
-    --glow-violet: 0 18px 65px rgba(253,186,116,0.18);
+  [data-theme="sunset"], [data-theme="peach"] {
+    --bg-primary: #f7eee4;
+    --bg-secondary: #ebdccd;
+    --bg-elevated: rgba(255,249,242,0.88);
+    --accent-cyan: #171717;
+    --accent-violet: #b85c38;
+    --accent-rose: #8a3f3f;
+    --text-primary: #171717;
+    --text-muted: #77685d;
+    --border: rgba(23,23,23,0.12);
+  }
+
+  [data-theme="forest"] {
+    --bg-primary: #eef2e8;
+    --bg-secondary: #dfe7d8;
+    --bg-elevated: rgba(250,253,247,0.88);
+    --accent-cyan: #15261d;
+    --accent-violet: #657a52;
+    --accent-rose: #7b3d35;
+    --text-primary: #142018;
+    --text-muted: #687261;
+    --border: rgba(20,32,24,0.13);
+  }
+
+  [data-theme="ocean"] {
+    --bg-primary: #edf3f4;
+    --bg-secondary: #dde8ea;
+    --bg-elevated: rgba(250,254,255,0.88);
+    --accent-cyan: #123244;
+    --accent-violet: #5b6f7a;
+    --accent-rose: #7a3f4d;
+    --text-primary: #13242c;
+    --text-muted: #63747a;
+    --border: rgba(19,36,44,0.13);
+  }
+
+  [data-theme="neon"] {
+    --bg-primary: #f5f0df;
+    --bg-secondary: #e9dfc6;
+    --bg-elevated: rgba(255,251,238,0.88);
+    --accent-cyan: #171717;
+    --accent-violet: #b08a36;
+    --accent-rose: #813d3d;
+    --text-primary: #171717;
+    --text-muted: #756b56;
+    --border: rgba(23,23,23,0.13);
   }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--accent-cyan) 38%, transparent) transparent;
+    scrollbar-color: color-mix(in srgb, var(--text-muted) 42%, transparent) transparent;
   }
 
   body {
     min-height: 100vh;
     background:
-      radial-gradient(circle at 18% 5%, color-mix(in srgb, var(--accent-cyan) 18%, transparent) 0, transparent 35%),
-      radial-gradient(circle at 78% 12%, color-mix(in srgb, var(--accent-violet) 18%, transparent) 0, transparent 32%),
-      linear-gradient(135deg, var(--bg-primary) 0%, #070916 48%, var(--bg-primary) 100%);
+      linear-gradient(90deg, rgba(23,23,23,0.045) 1px, transparent 1px),
+      linear-gradient(0deg, rgba(23,23,23,0.035) 1px, transparent 1px),
+      radial-gradient(circle at 22% 0%, rgba(155,107,67,0.10), transparent 34%),
+      var(--bg-primary);
+    background-size: 80px 80px, 80px 80px, auto, auto;
     color: var(--text-primary);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
@@ -125,7 +117,7 @@
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--accent-cyan) 35%, transparent);
+    background: color-mix(in srgb, var(--accent-violet) 28%, transparent);
     color: var(--text-primary);
   }
   
@@ -137,31 +129,28 @@
 @layer utilities {
   .bg-glass {
     background: var(--bg-glass);
-    backdrop-filter: blur(18px) saturate(145%);
-    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    backdrop-filter: blur(18px) saturate(118%);
+    -webkit-backdrop-filter: blur(18px) saturate(118%);
     border: 1px solid var(--border);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 60px rgba(0,0,0,0.24);
+    box-shadow: 0 18px 42px rgba(23,23,23,0.08);
   }
 
   .surface-card {
-    background:
-      linear-gradient(145deg, rgba(255,255,255,0.105), rgba(255,255,255,0.035)),
-      var(--bg-elevated);
+    background: var(--bg-elevated);
     border: 1px solid var(--border);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 24px 80px rgba(0,0,0,0.28);
-    backdrop-filter: blur(22px) saturate(150%);
-    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    box-shadow: 0 22px 54px rgba(23,23,23,0.08);
+    backdrop-filter: blur(16px) saturate(112%);
+    -webkit-backdrop-filter: blur(16px) saturate(112%);
   }
 
   .surface-card-strong {
     background:
-      radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--accent-cyan) 16%, transparent), transparent 32%),
-      linear-gradient(150deg, rgba(255,255,255,0.14), rgba(255,255,255,0.045)),
+      linear-gradient(180deg, rgba(255,255,255,0.54), rgba(255,255,255,0.16)),
       var(--bg-elevated);
     border: 1px solid var(--border-strong);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), var(--glow-cyan), 0 30px 90px rgba(0,0,0,0.34);
-    backdrop-filter: blur(26px) saturate(160%);
-    -webkit-backdrop-filter: blur(26px) saturate(160%);
+    box-shadow: 0 28px 70px rgba(23,23,23,0.11);
+    backdrop-filter: blur(18px) saturate(112%);
+    -webkit-backdrop-filter: blur(18px) saturate(112%);
   }
 
   .aurora-ring {
@@ -171,46 +160,36 @@
   .aurora-ring::before {
     content: '';
     position: absolute;
-    inset: -1px;
+    inset: 0;
     border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--accent-cyan) 70%, transparent), color-mix(in srgb, var(--accent-violet) 56%, transparent), transparent 70%);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
+    border: 1px solid color-mix(in srgb, var(--accent-violet) 35%, transparent);
     pointer-events: none;
   }
 
-  .glow-cyan {
+  .glow-cyan, .glow-violet {
     box-shadow: var(--glow-cyan);
   }
 
-  .glow-violet {
-    box-shadow: var(--glow-violet);
-  }
-
   .text-gradient-aurora {
-    background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 45%, var(--accent-violet) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    background: none;
+    color: var(--accent-violet);
   }
 
   .soft-grid {
     background-image:
-      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-    background-size: 42px 42px;
-    mask-image: radial-gradient(circle at center, black, transparent 72%);
+      linear-gradient(rgba(23,23,23,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(23,23,23,0.045) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: linear-gradient(180deg, black, transparent 92%);
   }
 
   .command-button {
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
-    color: #050712;
-    box-shadow: var(--glow-cyan);
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    box-shadow: 0 16px 32px rgba(23,23,23,0.14);
   }
 
   .text-shadow-aurora {
-    text-shadow: 0 0 18px color-mix(in srgb, var(--accent-cyan) 42%, transparent);
+    text-shadow: none;
   }
 }
