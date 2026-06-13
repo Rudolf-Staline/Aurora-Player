@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Cloud, Loader2, Music, RefreshCw } from 'lucide-react';
+import { Cloud, Loader2, Music, RefreshCw, ShieldCheck, HardDrive } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { forceDriveReauth, scanAllAudioFiles, getStreamUrl } from '../../utils/googleDriveApi';
 import { loadFromCloud, saveToCloud } from '../../utils/auroraSync';
@@ -17,23 +17,15 @@ interface DriveFile {
 
 function detectChanges(cached: DriveFile[], fresh: DriveFile[]): boolean {
   if (cached.length !== fresh.length) return true;
-  
   const cachedIds = new Set(cached.map(f => f.id));
   const freshIds = new Set(fresh.map(f => f.id));
-  
-  for (const id of freshIds) {
-    if (!cachedIds.has(id)) return true;
-  }
-  for (const id of cachedIds) {
-    if (!freshIds.has(id)) return true;
-  }
-  
+  for (const id of freshIds) if (!cachedIds.has(id)) return true;
+  for (const id of cachedIds) if (!freshIds.has(id)) return true;
   const cachedMap = new Map(cached.map(f => [f.id, f]));
   for (const file of fresh) {
     const cachedFile = cachedMap.get(file.id);
     if (cachedFile?.modifiedTime !== file.modifiedTime) return true;
   }
-  
   return false;
 }
 
@@ -45,6 +37,13 @@ const toTrack = (file: DriveFile, token: string): Track => ({
   url: getStreamUrl(file.id, token),
   duration: 0,
 });
+
+const formatSize = (size?: string) => {
+  const bytes = Number(size || 0);
+  if (!Number.isFinite(bytes) || bytes <= 0) return '—';
+  const mb = bytes / 1024 / 1024;
+  return mb >= 1024 ? `${(mb / 1024).toFixed(1)} Go` : `${mb.toFixed(1)} Mo`;
+};
 
 export const DrivePlayer: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('aurora_auth_token'));
@@ -64,10 +63,10 @@ export const DrivePlayer: React.FC = () => {
       if (newToken) {
         setToken(newToken);
       } else {
-        setError('Failed to authenticate with Google Drive.');
+        setError('Impossible de connecter Google Drive.');
       }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Authentication error.';
+      const errorMessage = err instanceof Error ? err.message : 'Erreur d’authentification.';
       setError(errorMessage);
     } finally {
       setIsScanning(false);
@@ -81,7 +80,6 @@ export const DrivePlayer: React.FC = () => {
 
   const loadLibrary = async () => {
     if (!token) return;
-    
     const cache = await loadFromCloud<{ files?: DriveFile[]; lastScanned?: string | null }>('aurora_drive_cache.json');
     if (cache?.files?.length) {
       setFiles(cache.files.map(({ id, name, mimeType, size, modifiedTime }) => ({ id, name, mimeType, size, modifiedTime })));
@@ -98,19 +96,16 @@ export const DrivePlayer: React.FC = () => {
     try {
       await scanAllAudioFiles(token, (newFiles: DriveFile[]) => {
         allFresh.push(...newFiles);
-        
         setFiles(prev => {
           const existingIds = new Set(prev.map(f => f.id));
           const toAdd = newFiles.filter(f => !existingIds.has(f.id));
           return toAdd.length > 0 ? [...prev, ...toAdd] : prev;
         });
-        
         setIsFirstLoad(false);
         setScanProgress(allFresh.length);
       });
 
       const hasChanges = detectChanges(cache?.files || [], allFresh);
-      
       if (hasChanges) {
         setFiles(allFresh);
         const newTimestamp = new Date().toISOString();
@@ -120,16 +115,12 @@ export const DrivePlayer: React.FC = () => {
           files: allFresh,
         });
         setLastScanned(newTimestamp);
-        
-        if (cache?.files?.length) {
-          toast.success(`Library updated — ${allFresh.length} files found`);
-        }
+        if (cache?.files?.length) toast.success(`Bibliothèque mise à jour — ${allFresh.length} fichiers trouvés`);
       }
 
       setLocalTracks(allFresh.map(file => toTrack(file, token)));
-
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch files from Google Drive.';
+      const message = err instanceof Error ? err.message : 'Impossible de récupérer les fichiers Google Drive.';
       setError(message);
       if (message.includes('permission') || message.includes('Session expirée')) {
         setToken(null);
@@ -142,104 +133,122 @@ export const DrivePlayer: React.FC = () => {
   };
 
   useEffect(() => {
-    if (token && files.length === 0) {
-       loadLibrary();
-    }
+    if (token && files.length === 0) loadLibrary();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+  const totalSize = files.reduce((sum, file) => sum + Number(file.size || 0), 0).toString();
 
   return (
     <div className="space-y-8 pb-10">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-white/5 pb-6">
-        <h1 className="text-3xl font-display font-bold text-text-primary flex items-center gap-3">
-            <Cloud className="text-accent-cyan" size={28} />
-            Google Drive
-            {token && <span className="text-xs font-mono font-bold px-2 py-1 rounded bg-green-500/20 text-green-400 border border-green-500/30">CONNECTED</span>}
-        </h1>
-        {token && (
-            <div className="flex items-center gap-4">
-                {lastScanned && (
-                    <span className="text-xs text-text-muted font-mono">
-                        Last scanned: {new Date(lastScanned).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                    </span>
-                )}
-                <button 
-                    onClick={loadLibrary}
-                    disabled={isScanning}
-                    className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-text-primary px-4 py-2 rounded-xl text-sm font-medium transition-colors border border-white/5 disabled:opacity-50"
-                >
-                    {isScanning ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
-                    Refresh
-                </button>
-                <button 
-                    onClick={handleConnect}
-                    disabled={isScanning}
-                    className="flex items-center gap-2 bg-accent-cyan/10 hover:bg-accent-cyan/20 text-accent-cyan px-4 py-2 rounded-xl text-sm font-medium transition-colors border border-accent-cyan/20 disabled:opacity-50"
-                >
-                    Reconnecter
-                </button>
+      <section className="surface-card-strong aurora-ring relative overflow-hidden rounded-[2rem] p-6 md:p-8">
+        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent-cyan/20 blur-3xl" />
+        <div className="absolute -bottom-28 left-12 h-72 w-72 rounded-full bg-accent-violet/15 blur-3xl" />
+        <div className="relative grid gap-8 lg:grid-cols-[1fr_0.65fr] lg:items-end">
+          <div>
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">
+              <Cloud size={14} /> Google Drive
             </div>
-        )}
-      </div>
+            <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-tight text-text-primary md:text-6xl">
+              Tes fichiers Drive, prêts à être <span className="text-gradient-aurora">streamés</span>.
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-text-muted">
+              Omed scanne les fichiers audio, garde un cache léger et régénère les liens de lecture pour éviter les URLs expirées.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <button 
+                onClick={token ? loadLibrary : handleConnect}
+                disabled={isScanning}
+                className="command-button inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-black transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isScanning ? <Loader2 size={18} className="animate-spin" /> : <RefreshCw size={18} />}
+                {token ? 'Scanner maintenant' : 'Connecter Drive'}
+              </button>
+              {token && (
+                <button 
+                  onClick={handleConnect}
+                  disabled={isScanning}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-accent-cyan/20 bg-accent-cyan/10 px-5 py-3 text-sm font-bold text-accent-cyan transition-colors hover:bg-accent-cyan/20 disabled:opacity-50"
+                >
+                  <ShieldCheck size={18} /> Reconnecter
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3 lg:grid-cols-1">
+            <div className="rounded-3xl bg-black/20 p-4 ring-1 ring-white/10">
+              <p className="text-3xl font-black text-text-primary">{files.length}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">Audios</p>
+            </div>
+            <div className="rounded-3xl bg-black/20 p-4 ring-1 ring-white/10">
+              <p className="text-3xl font-black text-text-primary">{formatSize(totalSize)}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">Taille</p>
+            </div>
+            <div className="rounded-3xl bg-black/20 p-4 ring-1 ring-white/10">
+              <p className="text-lg font-black text-text-primary">{token ? 'Connecté' : 'Off'}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-text-muted">État</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {lastScanned && (
+        <div className="surface-card flex items-center gap-3 rounded-3xl p-4 text-sm text-text-muted">
+          <HardDrive size={18} className="text-accent-cyan" /> Dernier scan : {new Date(lastScanned).toLocaleString()}
+        </div>
+      )}
 
       {!token ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-glass rounded-2xl border border-white/5">
-              <Cloud size={64} className="text-accent-cyan mb-6" />
-              <h2 className="text-2xl font-bold text-text-primary mb-2">Connect Google Drive</h2>
-              <p className="text-text-muted text-center max-w-md mb-8">
-                 Stream your personal audio files securely from your Google Drive. We also request app data access to sync Omed metadata.
-              </p>
-              <button 
-                 onClick={handleConnect}
-                 disabled={isScanning}
-                 className="flex items-center gap-2 bg-gradient-to-r from-accent-cyan to-accent-violet text-bg-primary px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-xl hover:opacity-90 transition-all disabled:opacity-50"
-              >
-                  {isScanning ? <Loader2 size={20} className="animate-spin" /> : <Cloud size={20} fill="currentColor" />}
-                  Connect Account
-              </button>
-              {error && <p className="text-accent-rose mt-4">{error}</p>}
+        <section className="surface-card flex min-h-[360px] flex-col items-center justify-center rounded-[2rem] p-8 text-center">
+          <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-[2rem] bg-accent-cyan/10 text-accent-cyan">
+            <Cloud size={40} />
           </div>
+          <h2 className="text-2xl font-black text-text-primary">Connecte Google Drive</h2>
+          <p className="mt-3 max-w-md text-sm leading-6 text-text-muted">
+            L’app demande la lecture Drive pour streamer tes audios et l’accès appData pour synchroniser les métadonnées Omed.
+          </p>
+          <button onClick={handleConnect} disabled={isScanning} className="command-button mt-6 inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-black disabled:opacity-50">
+            {isScanning ? <Loader2 size={18} className="animate-spin" /> : <Cloud size={18} />}
+            Connecter le compte
+          </button>
+          {error && <p className="mt-4 text-sm text-accent-rose">{error}</p>}
+        </section>
       ) : (
-          <div className="space-y-4">
-              {isScanning && (
-                  <div className="flex items-center gap-3 px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-sm text-text-muted mb-4">
-                      <Loader2 size={14} className="animate-spin text-accent-cyan" />
-                      <span>
-                          {scanProgress > 0 ? `Scanning... ${scanProgress} files found so far` : 'Starting scan...'}
-                      </span>
-                      <div className="flex-1 h-0.5 bg-white/10 rounded-full overflow-hidden ml-2">
-                          <div className="h-full bg-accent-cyan rounded-full animate-[pulse_1.5s_ease-in-out_infinite]" style={{ width: '100%' }} />
-                      </div>
-                  </div>
-              )}
+        <section className="surface-card rounded-[2rem] p-4 md:p-6">
+          {isScanning && (
+            <div className="mb-5 flex items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-text-muted">
+              <Loader2 size={16} className="animate-spin text-accent-cyan" />
+              <span>{scanProgress > 0 ? `Scan en cours — ${scanProgress} fichiers trouvés` : 'Initialisation du scan...'}</span>
+              <div className="ml-2 h-1 flex-1 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full w-full animate-pulse rounded-full bg-accent-cyan" />
+              </div>
+            </div>
+          )}
 
-              {error ? (
-                  <div className="text-accent-rose bg-accent-rose/10 p-4 rounded-lg">{error}</div>
-              ) : files.length === 0 && isFirstLoad ? (
-                  <div className="space-y-4">
-                      {Array.from({ length: 8 }).map((_, i) => (
-                          <div key={i} className="flex items-center gap-4 p-4 rounded-xl">
-                              <div className="w-10 h-10 rounded-lg bg-white/5 animate-pulse" />
-                              <div className="flex-1 space-y-2">
-                                  <div className="h-3 bg-white/5 rounded animate-pulse w-3/4" />
-                                  <div className="h-2 bg-white/5 rounded animate-pulse w-1/2" />
-                              </div>
-                          </div>
-                      ))}
+          {error ? (
+            <div className="rounded-3xl border border-accent-rose/20 bg-accent-rose/10 p-4 text-accent-rose">{error}</div>
+          ) : files.length === 0 && isFirstLoad ? (
+            <div className="space-y-3">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 rounded-3xl bg-white/[0.035] p-4">
+                  <div className="h-12 w-12 animate-pulse rounded-2xl bg-white/5" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-3/4 animate-pulse rounded bg-white/5" />
+                    <div className="h-2 w-1/2 animate-pulse rounded bg-white/5" />
                   </div>
-              ) : files.length === 0 && !isScanning ? (
-                  <div className="flex flex-col items-center justify-center py-20 text-text-muted gap-4">
-                      <Music size={48} className="opacity-20" />
-                      <p>No audio files found in your Google Drive.</p>
-                  </div>
-              ) : (
-                  <TrackList 
-                    tracks={files.map(file => toTrack(file, token))}
-                    onPlayContext={handlePlayDriveTrack}
-                  />
-              )}
-          </div>
+                </div>
+              ))}
+            </div>
+          ) : files.length === 0 && !isScanning ? (
+            <div className="flex flex-col items-center justify-center gap-4 py-20 text-center text-text-muted">
+              <Music size={52} className="opacity-25" />
+              <h2 className="text-xl font-black text-text-primary">Aucun fichier audio trouvé</h2>
+              <p className="max-w-md text-sm">Ajoute des fichiers audio dans ton Drive, puis relance un scan.</p>
+            </div>
+          ) : (
+            <TrackList tracks={files.map(file => toTrack(file, token))} onPlayContext={handlePlayDriveTrack} />
+          )}
+        </section>
       )}
     </div>
   );
