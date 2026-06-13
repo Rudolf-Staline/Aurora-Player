@@ -96,8 +96,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     className={({ isActive }) => 
                       `group flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold transition-all ${
                         isActive 
-                          ? 'bg-white/12 text-text-primary shadow-lg shadow-black/20 ring-1 ring-white/10' 
-                          : 'text-text-muted hover:bg-white/7 hover:text-text-primary'
+                          ? 'bg-white/[0.12] text-text-primary shadow-lg shadow-black/20 ring-1 ring-white/10' 
+                          : 'text-text-muted hover:bg-white/[0.07] hover:text-text-primary'
                       }`
                     }
                   >
@@ -133,8 +133,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     className={({ isActive }) => 
                       `flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-all ${
                         isActive 
-                          ? 'bg-white/12 text-accent-cyan ring-1 ring-white/10' 
-                          : 'text-text-muted hover:bg-white/7 hover:text-text-primary'
+                          ? 'bg-white/[0.12] text-accent-cyan ring-1 ring-white/10' 
+                          : 'text-text-muted hover:bg-white/[0.07] hover:text-text-primary'
                       }`
                     }
                   >
