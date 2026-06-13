@@ -11,39 +11,74 @@ interface PodcastResult {
   feedUrl?: string;
 }
 
+interface ItunesSearchResponse {
+  results?: unknown[];
+}
+
+const PAGE_SIZE = 30;
+
+const isPodcastResult = (value: unknown): value is PodcastResult => {
+  if (!value || typeof value !== 'object') return false;
+
+  const candidate = value as Partial<PodcastResult>;
+  return (
+    typeof candidate.collectionId === 'number' &&
+    typeof candidate.collectionName === 'string' &&
+    typeof candidate.artistName === 'string' &&
+    typeof candidate.artworkUrl600 === 'string'
+  );
+};
+
+const normalizePodcastResult = (result: PodcastResult): PodcastResult => ({
+  ...result,
+  genres: Array.isArray(result.genres) ? result.genres : [],
+});
+
+const buildItunesSearchUrl = (searchQuery: string): string => {
+  const params = new URLSearchParams({
+    term: searchQuery,
+    media: 'podcast',
+    entity: 'podcast',
+    limit: '200',
+  });
+
+  const endpoint = `https://itunes.apple.com/search?${params.toString()}`;
+  return import.meta.env.DEV ? `/itunes-proxy/search?${params.toString()}` : `/api/proxy?url=${encodeURIComponent(endpoint)}`;
+};
+
 export const PodcastSearch: React.FC = () => {
   const [query, setQuery] = useState('');
+  const [lastSearch, setLastSearch] = useState('');
   const [allResults, setAllResults] = useState<PodcastResult[]>([]);
   const [results, setResults] = useState<PodcastResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [hasMore, setHasMore] = useState(false);
   const navigate = useNavigate();
-  const PAGE_SIZE = 30;
 
   const fetchPodcasts = async (searchQuery: string) => {
+    const trimmedQuery = searchQuery.trim();
+    if (!trimmedQuery) return;
+
     try {
       setLoading(true);
       setError('');
-      // In production (Vercel), Vite proxies strictly do not work.
-      // We use the direct iTunes API URL, which supports CORS for GET.
-      const isDev = import.meta.env.DEV;
-      const baseUrl = isDev ? '/itunes-proxy' : '/api/proxy?url=' + encodeURIComponent('https://itunes.apple.com');
-      
-      const searchUrl = isDev 
-        ? `${baseUrl}/search?term=${encodeURIComponent(searchQuery)}&media=podcast&entity=podcast&limit=200`
-        : `${baseUrl}${encodeURIComponent('/search?term=' + encodeURIComponent(searchQuery) + '&media=podcast&entity=podcast&limit=200')}`;
+      setLastSearch(trimmedQuery);
 
-      const response = await fetch(searchUrl);
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
-      const fetchedResults = data.results || [];
+      const response = await fetch(buildItunesSearchUrl(trimmedQuery), { signal: AbortSignal.timeout(15000) });
+      if (!response.ok) throw new Error(`Podcast search failed with status ${response.status}`);
+
+      const data = (await response.json()) as ItunesSearchResponse;
+      const fetchedResults = (data.results || []).filter(isPodcastResult).map(normalizePodcastResult);
       
       setAllResults(fetchedResults);
       setResults(fetchedResults.slice(0, PAGE_SIZE));
       setHasMore(fetchedResults.length > PAGE_SIZE);
       
     } catch (err: unknown) {
+      setAllResults([]);
+      setResults([]);
+      setHasMore(false);
       setError(err instanceof Error ? err.message : 'Failed to fetch podcasts');
     } finally {
       setLoading(false);
@@ -52,7 +87,6 @@ export const PodcastSearch: React.FC = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim()) return;
     fetchPodcasts(query);
   };
 
@@ -79,7 +113,7 @@ export const PodcastSearch: React.FC = () => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={20} />
           <button 
             type="submit" 
-            disabled={loading}
+            disabled={loading || !query.trim()}
             className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-text-primary px-4 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
           >
             {loading ? <Loader2 size={16} className="animate-spin" /> : 'Search'}
@@ -89,6 +123,13 @@ export const PodcastSearch: React.FC = () => {
 
       {error && <div className="text-accent-rose bg-accent-rose/10 p-4 rounded-lg">{error}</div>}
 
+      {loading && results.length === 0 && (
+        <div className="flex items-center gap-3 text-text-muted py-8">
+          <Loader2 size={20} className="animate-spin text-accent-cyan" />
+          <span>Searching podcasts...</span>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
         {results.map((podcast) => (
           <div 
@@ -96,10 +137,11 @@ export const PodcastSearch: React.FC = () => {
             className="group bg-glass p-3 rounded-xl cursor-pointer hover:bg-white/10 transition-colors"
             onClick={() => navigate(`/podcasts/${podcast.collectionId}`, { state: { podcast } })}
           >
-            <div className="aspect-square w-full rounded-lg overflow-hidden shadow-lg mb-4">
+            <div className="aspect-square w-full rounded-lg overflow-hidden shadow-lg mb-4 bg-white/5">
               <img 
                 src={podcast.artworkUrl600} 
                 alt={podcast.collectionName} 
+                loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
               />
             </div>
@@ -111,12 +153,12 @@ export const PodcastSearch: React.FC = () => {
             </p>
           </div>
         ))}
-        {results.length === 0 && !loading && !error && query && (
-          <p className="col-span-full text-text-muted">No results found for "{query}"</p>
+        {results.length === 0 && !loading && !error && lastSearch && (
+          <p className="col-span-full text-text-muted">No results found for "{lastSearch}"</p>
         )}
       </div>
 
-      {results.length === 0 && !loading && !error && !query && (
+      {results.length === 0 && !loading && !error && !lastSearch && (
         <div className="pt-8">
             <h2 className="text-xl font-display font-semibold text-text-primary mb-6">Popular Categories</h2>
             <div className="flex flex-wrap gap-3">
