@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Play, Loader2, ArrowLeft, Heart, RefreshCw, Bell, BellOff, CheckCircle, Inbox } from 'lucide-react';
+import { Play, Loader2, ArrowLeft, Heart, RefreshCw, Bell, BellOff, CheckCircle, Inbox, Radio } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { parseRSSFeed, type PodcastEpisode } from '../../utils/rssParser';
 import { type Track } from '../../store/usePlayerStore';
@@ -128,9 +128,10 @@ export const PodcastDetail: React.FC = () => {
 
   if (!podcast) {
     return (
-      <div className="flex flex-col items-center justify-center h-full space-y-4">
-        <p className="text-text-muted">Aucun podcast sélectionné.</p>
-        <button onClick={() => navigate('/podcasts')} className="text-accent-cyan hover:underline">Retour à la recherche</button>
+      <div className="surface-card flex min-h-[50vh] flex-col items-center justify-center rounded-[2rem] p-8 text-center">
+        <Inbox size={46} className="mb-4 text-text-muted" />
+        <p className="text-lg font-bold text-text-primary">Aucun podcast sélectionné.</p>
+        <button onClick={() => navigate('/podcasts')} className="mt-4 rounded-2xl bg-white/[0.08] px-5 py-3 text-sm font-bold text-accent-cyan hover:bg-white/[0.12]">Retour à la recherche</button>
       </div>
     );
   }
@@ -139,146 +140,150 @@ export const PodcastDetail: React.FC = () => {
     <div className="space-y-8 pb-10">
       <button 
         onClick={() => navigate(-1)} 
-        className="flex items-center gap-2 text-text-muted hover:text-text-primary transition-colors bg-white/5 px-4 py-2 rounded-lg w-fit"
+        className="surface-card inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-text-muted transition-colors hover:text-text-primary"
       >
         <ArrowLeft size={18} />
         Retour
       </button>
 
-      <div className="flex flex-col md:flex-row gap-8 items-start">
-        <div className="w-full md:w-1/3 max-w-sm sticky top-6">
-          <div className="aspect-square w-full rounded-2xl overflow-hidden shadow-2xl glow-cyan mb-6 bg-white/5">
-            <img src={podcast.artworkUrl600} alt={podcast.collectionName} className="w-full h-full object-cover" />
+      <section className="surface-card-strong aurora-ring relative overflow-hidden rounded-[2rem] p-6 md:p-8">
+        <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-accent-violet/20 blur-3xl" />
+        <div className="absolute -bottom-28 left-20 h-72 w-72 rounded-full bg-accent-cyan/15 blur-3xl" />
+        <div className="relative grid gap-8 lg:grid-cols-[260px_1fr] lg:items-end">
+          <div className="relative mx-auto aspect-square w-full max-w-[260px] overflow-hidden rounded-[2rem] bg-white/[0.06] shadow-2xl shadow-black/40">
+            <img src={podcast.artworkUrl600} alt={podcast.collectionName} className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           </div>
-          <h1 className="text-2xl font-display font-bold text-text-primary mb-2">{podcast.collectionName}</h1>
-          <p className="text-lg text-text-muted mb-4">{podcast.artistName}</p>
-          
-          <button 
-             onClick={handleToggleSubscribe}
-             className={`flex w-full items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold mb-6 transition-all shadow-lg ${isSub ? 'bg-white/10 text-text-primary hover:bg-white/20 border border-white/10' : 'bg-gradient-to-r from-accent-cyan to-accent-violet text-bg-primary hover:opacity-90'}`}
-          >
-             {isSub ? (
-                 <>
-                     <BellOff size={20} />
-                     Se désabonner
-                 </>
-             ) : (
-                 <>
-                     <Bell size={20} />
-                     S'abonner
-                 </>
-             )}
-          </button>
 
-          <div className="flex flex-wrap gap-2 mb-6">
-             {podcast.genres?.slice(0, 3).map((genre: string, i: number) => (
-                <span key={i} className="text-xs font-medium px-2 py-1 bg-white/10 rounded-full text-text-primary">{genre}</span>
-             ))}
-          </div>
-        </div>
-
-        <div className="w-full md:w-2/3">
-          <div className="flex items-center justify-between mb-6 border-b border-white/5 pb-2">
-            <h2 className="text-xl font-display font-semibold">Épisodes</h2>
-            {isSub && !loading && episodes.length > 0 && (
-               <div className="bg-white/10 px-3 py-1 rounded-full text-sm font-medium text-accent-cyan flex items-center gap-2">
-                 <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-cyan opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-cyan"></span>
-                 </span>
-                 {unplayedCount} nouveaux non joués
-               </div>
-            )}
-          </div>
-          
-          {loading && (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="animate-spin text-accent-cyan" size={32} />
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">
+              <Radio size={14} /> Podcast
             </div>
-          )}
+            <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-text-primary md:text-6xl">{podcast.collectionName}</h1>
+            <p className="mt-3 text-lg text-text-muted">{podcast.artistName}</p>
 
-          {error && (
-            <div className="flex flex-col items-start gap-4 text-accent-rose bg-accent-rose/10 p-4 rounded-lg">
-              <p>{error}</p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
               <button 
-                onClick={fetchEpisodes} 
-                className="flex items-center gap-2 bg-accent-rose text-bg-primary px-4 py-2 rounded-lg font-medium hover:bg-accent-rose/80 transition-colors"
+                onClick={handleToggleSubscribe}
+                className={`inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-black transition-all ${isSub ? 'border border-white/10 bg-white/[0.08] text-text-primary hover:bg-white/[0.12]' : 'command-button'}`}
               >
-                <RefreshCw size={16} />
-                Réessayer la connexion
+                {isSub ? <BellOff size={19} /> : <Bell size={19} />}
+                {isSub ? 'Se désabonner' : "S'abonner"}
               </button>
-            </div>
-          )}
-
-          {!loading && !error && episodes.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 px-6 rounded-2xl bg-white/5 text-text-muted border border-white/5">
-              <Inbox size={42} className="mb-4 opacity-60" />
-              <p className="font-medium text-text-primary">Aucun épisode lisible trouvé</p>
-              <p className="text-sm mt-2 text-center max-w-md">Le flux existe peut-être, mais aucun épisode avec fichier audio n'a été détecté.</p>
-            </div>
-          )}
-
-          {!loading && !error && episodes.length > 0 && (
-            <div className="space-y-4">
-              {episodes.slice(0, visibleCount).map((episode) => {
-                const isPlayed = playedEpisodes[episode.id];
-                return (
-                <div key={episode.id} className={`group bg-glass p-4 rounded-xl transition-colors border-l-4 border-transparent hover:border-accent-cyan ${isPlayed ? 'opacity-60' : 'hover:bg-white/10'}`}>
-                  <div className="flex gap-4">
-                    <button 
-                      onClick={() => handlePlayEpisode(episode)}
-                      className="shrink-0 flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-text-primary hover:bg-accent-cyan hover:text-bg-primary transition-colors"
-                    >
-                      <Play size={20} fill="currentColor" className="ml-1" />
-                    </button>
-                    <div className="flex-1 overflow-hidden">
-                      <h3 className="font-semibold text-text-primary mb-1 line-clamp-2">{episode.title}</h3>
-                      <p className="text-sm text-text-muted line-clamp-2 mb-3">{episode.description}</p>
-                      <div className="flex items-center gap-4 text-xs font-mono text-text-muted">
-                        {episode.pubDate && <span>{episode.pubDate}</span>}
-                        {episode.duration > 0 && (
-                          <span>{Math.floor(episode.duration / 60)} min</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="shrink-0 flex flex-col items-center gap-2">
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); toggleFavorite(episode.id); }}
-                        className={`transition-colors p-2 rounded-full opacity-0 group-hover:opacity-100 ${favorites.includes(episode.id) ? 'text-accent-rose opacity-100' : 'text-text-muted hover:text-accent-rose hover:bg-white/5'}`}
-                        title="Ajouter aux favoris"
-                      >
-                        <Heart size={20} fill={favorites.includes(episode.id) ? 'currentColor' : 'none'} />
-                      </button>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); markAsPlayed(episode.id); }}
-                        className={`transition-colors p-2 rounded-full ${isPlayed ? 'text-accent-cyan opacity-100' : 'text-text-muted hover:text-accent-cyan hover:bg-white/5 opacity-0 group-hover:opacity-100'}`}
-                        title={isPlayed ? "Lu" : "Marquer comme lu"}
-                      >
-                         <CheckCircle size={20} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                );
-              })}
-              
-              <div className="flex flex-col items-center pt-8 pb-4 gap-4">
-                <span className="text-sm text-text-muted font-mono">
-                  Affichage de {Math.min(visibleCount, episodes.length)} sur {episodes.length} épisodes
-                </span>
-                {episodes.length > visibleCount && (
-                  <button 
-                    onClick={() => setVisibleCount(prev => prev + VISIBLE_EPISODE_INCREMENT)}
-                    className="px-6 py-2 bg-white/5 hover:bg-white/10 text-text-primary rounded-xl font-medium transition-all shadow-lg hover:shadow-xl border border-white/5"
-                  >
-                    Afficher plus d'épisodes
-                  </button>
-                )}
+              <div className="flex flex-wrap gap-2">
+                {podcast.genres?.slice(0, 4).map((genre: string) => (
+                  <span key={genre} className="rounded-full bg-black/20 px-3 py-1.5 text-xs font-bold text-text-muted ring-1 ring-white/10">{genre}</span>
+                ))}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="surface-card rounded-[2rem] p-4 md:p-6">
+        <div className="mb-6 flex flex-col justify-between gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">Flux RSS</p>
+            <h2 className="text-2xl font-black text-text-primary">Épisodes</h2>
+          </div>
+          {isSub && !loading && episodes.length > 0 && (
+            <div className="inline-flex items-center gap-2 rounded-full bg-accent-cyan/10 px-3 py-1.5 text-sm font-bold text-accent-cyan">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-cyan opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-cyan" />
+              </span>
+              {unplayedCount} non joués
+            </div>
           )}
         </div>
-      </div>
+        
+        {loading && (
+          <div className="flex items-center justify-center gap-3 py-16 text-text-muted">
+            <Loader2 className="animate-spin text-accent-cyan" size={28} />
+            <span>Chargement des épisodes...</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="flex flex-col items-start gap-4 rounded-3xl border border-accent-rose/20 bg-accent-rose/10 p-5 text-accent-rose">
+            <p>{error}</p>
+            <button 
+              onClick={fetchEpisodes} 
+              className="inline-flex items-center gap-2 rounded-2xl bg-accent-rose px-4 py-2 text-sm font-black text-bg-primary transition-opacity hover:opacity-85"
+            >
+              <RefreshCw size={16} />
+              Réessayer la connexion
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && episodes.length === 0 && (
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-black/15 px-6 py-16 text-center text-text-muted">
+            <Inbox size={42} className="mb-4 opacity-60" />
+            <p className="font-bold text-text-primary">Aucun épisode lisible trouvé</p>
+            <p className="mt-2 max-w-md text-sm">Le flux existe peut-être, mais aucun épisode avec fichier audio n'a été détecté.</p>
+          </div>
+        )}
+
+        {!loading && !error && episodes.length > 0 && (
+          <div className="space-y-3">
+            {episodes.slice(0, visibleCount).map((episode) => {
+              const isPlayed = playedEpisodes[episode.id];
+              return (
+              <article key={episode.id} className={`group rounded-3xl border border-white/10 bg-white/[0.04] p-4 transition-all hover:border-accent-cyan/35 hover:bg-white/[0.07] ${isPlayed ? 'opacity-60' : ''}`}>
+                <div className="flex gap-4">
+                  <button 
+                    onClick={() => handlePlayEpisode(episode)}
+                    className="command-button flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-transform hover:scale-105"
+                    aria-label={`Lire ${episode.title}`}
+                  >
+                    <Play size={20} fill="currentColor" className="ml-1" />
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="line-clamp-2 font-black text-text-primary">{episode.title}</h3>
+                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-muted">{episode.description}</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-3 font-mono text-xs text-text-muted">
+                      {episode.pubDate && <span>{episode.pubDate}</span>}
+                      {episode.duration > 0 && <span>{Math.floor(episode.duration / 60)} min</span>}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-center gap-2">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); toggleFavorite(episode.id); }}
+                      className={`rounded-2xl p-2 transition-colors ${favorites.includes(episode.id) ? 'bg-accent-rose/15 text-accent-rose' : 'text-text-muted hover:bg-white/[0.08] hover:text-accent-rose'}`}
+                      title="Ajouter aux favoris"
+                    >
+                      <Heart size={20} fill={favorites.includes(episode.id) ? 'currentColor' : 'none'} />
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); markAsPlayed(episode.id); }}
+                      className={`rounded-2xl p-2 transition-colors ${isPlayed ? 'bg-accent-cyan/15 text-accent-cyan' : 'text-text-muted hover:bg-white/[0.08] hover:text-accent-cyan'}`}
+                      title={isPlayed ? 'Lu' : 'Marquer comme lu'}
+                    >
+                      <CheckCircle size={20} />
+                    </button>
+                  </div>
+                </div>
+              </article>
+              );
+            })}
+            
+            <div className="flex flex-col items-center gap-4 pt-8 pb-4">
+              <span className="font-mono text-sm text-text-muted">
+                Affichage de {Math.min(visibleCount, episodes.length)} sur {episodes.length} épisodes
+              </span>
+              {episodes.length > visibleCount && (
+                <button 
+                  onClick={() => setVisibleCount(prev => prev + VISIBLE_EPISODE_INCREMENT)}
+                  className="surface-card rounded-2xl px-6 py-3 text-sm font-black text-text-primary transition-all hover:-translate-y-0.5 hover:border-accent-cyan/35"
+                >
+                  Afficher plus d'épisodes
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 };
