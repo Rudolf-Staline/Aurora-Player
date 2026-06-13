@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Cloud, Loader2, Music, RefreshCw } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { forceDriveReauth, requireDriveAuth, scanAllAudioFiles, getStreamUrl } from '../../utils/googleDriveApi';
+import { forceDriveReauth, scanAllAudioFiles, getStreamUrl } from '../../utils/googleDriveApi';
 import { loadFromCloud, saveToCloud } from '../../utils/auroraSync';
 import { usePlayerStore, type Track } from '../../store/usePlayerStore';
 import { TrackList } from '../music/TrackList';
