@@ -179,7 +179,7 @@ export const SettingsPage: React.FC = () => {
               <button
                 key={d}
                 onClick={() => setDensity(d)}
-                className={`rounded-xl px-4 py-2 text-sm font-bold capitalize transition-colors ${density === d ? 'bg-white/12 text-accent-cyan' : 'text-text-muted hover:text-text-primary'}`}
+                className={`rounded-xl px-4 py-2 text-sm font-bold capitalize transition-colors ${density === d ? 'bg-white/[0.12] text-accent-cyan' : 'text-text-muted hover:text-text-primary'}`}
               >
                 {d}
               </button>
